@@ -118,6 +118,15 @@ void set_intervalle_annees(t_critere critere, char *annees);
 void set_annee_parution_min(t_critere critere, int annee);
 void set_annee_parution_max(t_critere critere, int annee);
 
+/**
+ * Mutateurs du critere d'evaluation
+ *
+ * Permet d'ajouter le critere d'evaluation à la structure critere
+ *
+ * critere : la structure à modifier
+ * evaluation: critere d'evalluation
+ */
+void set_evaluation(t_critere critere, int evaluation);
 
 /* OBSERVATEURS DES CRITÈRES */
 

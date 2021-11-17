@@ -21,6 +21,7 @@
 #include "recherche.h"
 #include "imdb.h"
 #include "resultat.h"
+#include "comm.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

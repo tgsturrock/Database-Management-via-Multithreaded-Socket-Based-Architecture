@@ -89,7 +89,9 @@ void set_intervalle_annees(t_critere critere, char *annees) {
     else 
         critere->annee_parution_max = critere->annee_parution_min;
 }
-
+void set_evaluation(t_critere critere, int evaluation){
+	critere->evaluation=evaluation;
+}
 // Observateurs
 char* get_titre(t_critere critere) {
     return critere->titre;
