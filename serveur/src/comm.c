@@ -271,7 +271,7 @@ void serveur_envoit_resultat(int descripteur_fifo_serveur_ecriture, t_resultat r
 	printf("[*] Resultats envoyes \n\n");
 }
 
-void serveur_envoi_cote(int descripteur_fifo_serveur_ecriture  ,t_titre titre_chercher){
+void serveur_envoi_cote(int descripteur_fifo_serveur_ecriture, t_titre titre_chercher){
 
 	int taille_titre;
 	int taille_genre;
@@ -284,51 +284,65 @@ void serveur_envoi_cote(int descripteur_fifo_serveur_ecriture  ,t_titre titre_ch
 
 	char null[2]="0";
 
-			//On envoit le champ cote et sa taille au client
-			if(get_moyenne(titre_chercher)==NULL){
-				taille_cote= strlen(null)+1;
-				noctets = write(descripteur_fifo_serveur_ecriture, &taille_cote, sizeof(int));
-				if(noctets < sizeof(int)) {
-					printf("Probleme lors de l'ecriture de la taille du champ cote moyenne dans le FIFO\n");
-					exit(1);
-				}
-				noctets = write(descripteur_fifo_serveur_ecriture,null,taille_cote*sizeof(char));
-				if(noctets < taille_cote*sizeof(char)) {
-					printf("Probleme lors de l'ecriture du champ cote moyenne dans le FIFO\n");
-					exit(1);
-				}
-			}
-			else{
-				taille_cote= strlen(get_moyenne(titre_chercher))+1;
-				noctets = write(descripteur_fifo_serveur_ecriture, &taille_cote, sizeof(int));
-				if(noctets < sizeof(int)) {
-					printf("Probleme lors de l'ecriture de la taille du champ cote moyenne dans le FIFO\n");
-					exit(1);
-				}
-				noctets = write(descripteur_fifo_serveur_ecriture,get_moyenne(titre_chercher),taille_cote*sizeof(char));
-				if(noctets < taille_cote*sizeof(char)) {
-					printf("Probleme lors de l'ecriture du champ cote moyenne dans le FIFO\n");
-					exit(1);
-				}
-			}
+	//On envoit le champ ID et sa taille au client
+	taille_ID = strlen(get_ID_t(titre_chercher))+1;
+	noctets = write(descripteur_fifo_serveur_ecriture, &taille_ID, sizeof(int));
+	if(noctets < sizeof(int)) {
+		printf("Probleme lors de l'ecriture de la taille du champ ID dans le FIFO\n");
+		exit(1);
+	}
+	noctets = write(descripteur_fifo_serveur_ecriture,get_ID_t(titre_chercher),taille_ID*sizeof(char));
+	if(noctets < taille_ID*sizeof(char)) {
+		printf("Probleme lors de l'ecriture du champ ID dans le FIFO\n");
+		exit(1);
+	}
 
-			//On envoi le nombre de vote
-			if(get_vote(titre_chercher)==-1){
-				vote = 0;
-				noctets = write(descripteur_fifo_serveur_ecriture, &vote , sizeof(int));
-				if(noctets < sizeof(int)) {
-					printf("Probleme lors de l'ecriture du champ nombre de votes dans le FIFO\n");
-					exit(1);
-				}
-			}
-			else{
-				vote = get_vote(titre_chercher);
-				noctets = write(descripteur_fifo_serveur_ecriture, &vote , sizeof(int));
-				if(noctets < sizeof(int)) {
-					printf("Probleme lors de l'ecriture du champ nombre de votes dans le FIFO\n");
-					exit(1);
-				}
-			}
+	//On envoit le champ cote et sa taille au client
+	if(get_moyenne(titre_chercher)==NULL){
+		taille_cote= strlen(null)+1;
+		noctets = write(descripteur_fifo_serveur_ecriture, &taille_cote, sizeof(int));
+		if(noctets < sizeof(int)) {
+			printf("Probleme lors de l'ecriture de la taille du champ cote moyenne dans le FIFO\n");
+			exit(1);
+		}
+		noctets = write(descripteur_fifo_serveur_ecriture,null,taille_cote*sizeof(char));
+		if(noctets < taille_cote*sizeof(char)) {
+			printf("Probleme lors de l'ecriture du champ cote moyenne dans le FIFO\n");
+			exit(1);
+		}
+	}
+	else{
+		taille_cote= strlen(get_moyenne(titre_chercher))+1;
+		noctets = write(descripteur_fifo_serveur_ecriture, &taille_cote, sizeof(int));
+		if(noctets < sizeof(int)) {
+			printf("Probleme lors de l'ecriture de la taille du champ cote moyenne dans le FIFO\n");
+			exit(1);
+		}
+		noctets = write(descripteur_fifo_serveur_ecriture,get_moyenne(titre_chercher),taille_cote*sizeof(char));
+		if(noctets < taille_cote*sizeof(char)) {
+			printf("Probleme lors de l'ecriture du champ cote moyenne dans le FIFO\n");
+			exit(1);
+		}
+	}
+
+	//On envoi le nombre de vote
+	if(get_vote(titre_chercher)==-1){
+		vote = 0;
+		noctets = write(descripteur_fifo_serveur_ecriture, &vote , sizeof(int));
+		if(noctets < sizeof(int)) {
+			printf("Probleme lors de l'ecriture du champ nombre de votes dans le FIFO\n");
+			exit(1);
+		}
+	}
+	else{
+		vote = get_vote(titre_chercher);
+		noctets = write(descripteur_fifo_serveur_ecriture, &vote , sizeof(int));
+		if(noctets < sizeof(int)) {
+			printf("Probleme lors de l'ecriture du champ nombre de votes dans le FIFO\n");
+			exit(1);
+		}
+	}
+//comm-HLR08 finie
 }
 
 void serveur_envoi_nouvcote(int descripteur_fifo_serveur_ecriture, t_titre titre_chercher){

@@ -182,4 +182,15 @@ char* get_categorie(t_critere critere);
 int get_annee_parution_min(t_critere critere);
 int get_annee_parution_max(t_critere critere);
 
+/**
+ * Observateur du critere d'evaluation
+ *
+ * Permet d'obtenir le critere d'evaluation de la structure critere
+ *
+ * critere : la structure à observer
+ *
+ * Retour : Entier reprensantant le critere d'evaluation
+ *
+ */
+int get_evaluation (t_critere critere);
 #endif

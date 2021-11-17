@@ -112,3 +112,10 @@ int get_annee_parution_min(t_critere critere) {
 int get_annee_parution_max(t_critere critere) {
     return critere->annee_parution_max;
 }
+/*
+ * Fonction publique qui permet d'observer la valeur associe a la demande d'evaluation d'un
+ * titre par le client.
+ */
+int get_evaluation (t_critere critere){
+	return critere->evaluation;
+}
