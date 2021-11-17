@@ -472,11 +472,29 @@ int main(int argc, char *argv[]) {
 			printf("Probleme lors de l'ecriture de la note dans le FIFO\n");
 			exit(1);
 		}
+		free(ID_eval);
+		free(cote_eval);
+
 	    //comm-HLR10 finie
 
 	    //Lab 3 comm-HLR13
 		/* On recoit et affiche les nouvelles informations*/
+
+		noctets=read(descripteur_fifo_serveur_lecture,&taille_ID_eval,sizeof(int));
+		if(noctets == sizeof(int)) {
+			ID_eval = malloc(taille_ID_eval*sizeof(char));
+		}
+		else {
+			printf("Erreur lors de la lecture de la taille du champ ID du FIFO\n");
+			exit(1);
+		}
+		noctets=read(descripteur_fifo_serveur_lecture, ID_eval,taille_ID_eval*sizeof(char));
+		if(noctets != taille_ID_eval*sizeof(char)) {
+			printf("Erreur lors de la lecture du champ ID du FIFO\n");
+			exit(1);
+		}
 		printf("\t- Titre: %s\n",ID_eval);
+
 		noctets=read(descripteur_fifo_serveur_lecture,&taille_nouvelle_cote,sizeof(int));
 		if(noctets == sizeof(int)) {
 			nouvelle_cote = malloc(taille_nouvelle_cote*sizeof(char));
@@ -500,9 +518,7 @@ int main(int argc, char *argv[]) {
 		printf("\t- Nouveau nombre de votes: %i \n",nouveau_nb_vote);
 		//comm-HLR13 finie
 		free(ID_eval);
-		free(cote_eval);
 		free(nouvelle_cote);
-
 	}
 	//comm-HLR06 finie
 

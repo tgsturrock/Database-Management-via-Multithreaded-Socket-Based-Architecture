@@ -273,11 +273,8 @@ void serveur_envoit_resultat(int descripteur_fifo_serveur_ecriture, t_resultat r
 
 void serveur_envoi_cote(int descripteur_fifo_serveur_ecriture, t_titre titre_chercher){
 
-	int taille_titre;
-	int taille_genre;
-	int taille_categorie;
+
 	int taille_ID;
-	int annee_parution_min;
 	int taille_cote;
 	int vote;
 	int noctets=0;
@@ -347,14 +344,16 @@ void serveur_envoi_cote(int descripteur_fifo_serveur_ecriture, t_titre titre_che
 
 void serveur_envoi_nouvcote(int descripteur_fifo_serveur_ecriture, t_titre titre_chercher){
 
+
+	int taille_ID;
 	int taille_cote;
 	int vote;
 	int noctets=0;
-	int taille_ID;
+
 
 	//Lab3 comm-HLR12
 	/*Le serveur cherche les nouvelles données de classement du titre évalué et les envoie au client.*/
-	//On envoit le champ cote et sa taille au client
+
 	//On envoit le champ ID et sa taille au client
 	taille_ID = strlen(get_ID_t(titre_chercher))+1;
 	noctets = write(descripteur_fifo_serveur_ecriture, &taille_ID, sizeof(int));
@@ -368,6 +367,7 @@ void serveur_envoi_nouvcote(int descripteur_fifo_serveur_ecriture, t_titre titre
 		exit(1);
 	}
 
+	//On envoit le champ cote et sa taille au client
 	taille_cote= strlen(get_moyenne(titre_chercher))+1;
 	noctets = write(descripteur_fifo_serveur_ecriture, &taille_cote, sizeof(int));
 	if(noctets < sizeof(int)) {

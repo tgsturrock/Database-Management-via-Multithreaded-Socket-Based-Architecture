@@ -35,25 +35,12 @@
 
 
 int main(int argc, char *argv[]) {
-	char *titre = NULL, *genre = NULL, *categorie = NULL;
+
 	int descripteur_fifo_client_lecture;
 	int descripteur_fifo_serveur_ecriture;
 	int noctets=0;
-	int erreur=0;
-
-	char null[2]="0";
-
-	int annee_parution_min;
-	int annee_parution_max;
-	int taille_titre;
-	int taille_genre;
-	int taille_categorie;
-	int taille_ID;
-
-	int flag;
 	int num_titre;
-	int taille_cote;
-	int vote;
+
 	float cote;
 
 	//Demarage du serveur
@@ -70,7 +57,7 @@ int main(int argc, char *argv[]) {
 	t_critere critere = creer_critere();
 
 	//Le serveur recoit les critere de recherche envoye par le client
-	serveur_recoit_critere(descripteur_fifo_client_lecture,critere);
+	serveur_recoit_critere(descripteur_fifo_client_lecture, critere);
 	/* Tube-HLR03 finie */
 
 	//Recherche dans la base de donnee pour des titre qui concorde avec les criteres de recherche
@@ -92,20 +79,21 @@ int main(int argc, char *argv[]) {
 	//Lab3 comm-HLR07
 	/*Si le champ relié à l'argument -v a bien été reçu lors du requis Comm-HLR02,
 	 *le serveur est capable de récupérer le titre à évaluer par le client.*/
-		if(get_evaluation(critere) == 1){
+	if(get_evaluation(critere) == 1){
+
 		noctets = read(descripteur_fifo_client_lecture, &num_titre, sizeof(int));
 		if(noctets != sizeof(int)) {
 			printf("Erreur lors de la lecture du numero de titre a evaluer \n");
 			exit(1);
 		}
-	//comm-HLR07 finie
+		//comm-HLR07 finie
 
 		//Lab3 comm-HLR08
 		/*Le serveur cherche les données de classement du titre à évaluer et les envoie au client.*/
 		t_titre titre_chercher;
 		printf("[*] Titre a evaluer:\n");
 		titre_chercher = print_titre(resultat,(num_titre-1));
-
+		//Le serveur envoise la cote du titre demande
 		serveur_envoi_cote(descripteur_fifo_serveur_ecriture, titre_chercher);
 		//comm-HLR08 finie
 
@@ -121,49 +109,16 @@ int main(int argc, char *argv[]) {
 		fichier_cote(titre_chercher, cote);
 		//comm-HLR11 finie
 
-		//Lab3 comm-HLR12
-		/*Le serveur cherche les nouvelles données de classement du titre évalué et les envoie au client.*/
-		//On envoit le champ cote et sa taille au client
-		taille_cote= strlen(get_moyenne(titre_chercher))+1;
-		noctets = write(descripteur_fifo_serveur_ecriture, &taille_cote, sizeof(int));
-		if(noctets < sizeof(int)) {
-			printf("Probleme lors de l'ecriture de la taille du nouveau champ cote moyenne dans le FIFO\n");
-			exit(1);
-		}
-		noctets = write(descripteur_fifo_serveur_ecriture,get_moyenne(titre_chercher),taille_cote*sizeof(char));
-		if(noctets < taille_cote*sizeof(char)) {
-			printf("Probleme lors de l'ecriture du nouveau champ cote moyenne dans le FIFO\n");
-			exit(1);
-		}
-		//On envoi le nombre de vote
-		vote = get_vote(titre_chercher);
-		noctets = write(descripteur_fifo_serveur_ecriture, &vote , sizeof(int));
-		if(noctets < sizeof(int)) {
-			printf("Probleme lors de l'ecriture du nouveau nombre de vote dans le FIFO\n");
-			exit(1);
-		}
-		//comm-HLR12 finie
+		serveur_envoi_nouvcote(descripteur_fifo_serveur_ecriture, titre_chercher);
 
 	}
 	//Tube-HLR04 finie
 	//comm-HLR03 finie
 
-	//Lab2-HLR26
-	/*
-	 * Toute la memoire alloue est desallouee avant de quitter le progamme.
-	 */
-	for (int i = 0; i < get_nb_titre(resultat); i++) {
-		if (get_titre_r(resultat, i) != NULL) {
-			detruire_titre(get_titre_r(resultat, i));
-		}
-	}
 	//libere la memoire
 	detruire_resultat(resultat);
 	detruire_critere(critere);
 
-	free(titre);
-	free(genre);
-	free(categorie);
 
 	close(descripteur_fifo_serveur_ecriture);
 	close(descripteur_fifo_client_lecture);
@@ -171,7 +126,7 @@ int main(int argc, char *argv[]) {
 	unlink(FIFO_CLIENT_LECTURE);
 	printf("[-] Fermeture du serveur.\n");
 	return 0;
-	}
+}
 //HLR26 finie
 
 //HLR26 finie

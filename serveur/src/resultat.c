@@ -256,6 +256,11 @@ void detruire_titre(t_titre titre) {
 	free(titre);
 }
 void detruire_resultat(t_resultat resultat) {
+	for (int i = 0; i < resultat->nb_titre; i++) {
+		if (resultat->titre[i] != NULL) {
+			detruire_titre(resultat->titre[i]);
+		}
+	}
 	free(resultat->titre);
 	free(resultat);
 }

@@ -47,7 +47,16 @@ t_critere creer_critere(void) {
 
 // Destructeur
 void detruire_critere(t_critere critere) {
-    free(critere);
+    if(critere->categorie!=NULL){
+    	free(critere->categorie);
+    }
+    if(critere->titre!=NULL){
+    	free(critere->titre);
+    }
+    if(critere->genre!=NULL){
+    	free(critere->genre);
+    }
+	free(critere);
 }
 
 // Mutateurs
