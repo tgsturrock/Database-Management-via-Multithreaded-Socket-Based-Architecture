@@ -19,11 +19,9 @@
 #include <sys/stat.h>
 #include <string.h>
 
-#define FIFO_CLIENT_LECTURE "/tmp/fifo1"
-#define FIFO_SERVEUR_ECRITURE "/tmp/fifo2"
 
 
-void client_envoi_critere(int descripteur_fifo_client_ecriture, t_critere critere){
+void client_envoi_critere(int descripteur_socket_client, t_critere critere){
 
 	int taille_titre;
 	int taille_genre;
@@ -35,12 +33,12 @@ void client_envoi_critere(int descripteur_fifo_client_ecriture, t_critere criter
 	/*Le client envoie une operation de recherche au serveur ou les criteres sont inclus */
 	//On envois le champ titre et sa taille au serveur
 	taille_titre=strlen(get_titre(critere))+1;
-	noctets=write(descripteur_fifo_client_ecriture, &taille_titre, sizeof(int));
+	noctets=write(descripteur_socket_client, &taille_titre, sizeof(int));
 	if(noctets < sizeof(int)) {
 		printf("Probleme lors de l'ecriture de la taille du champ titre dans le FIFO\n");
 		exit(1);
 	}
-	noctets=write(descripteur_fifo_client_ecriture,get_titre(critere),taille_titre*sizeof(char));
+	noctets=write(descripteur_socket_client,get_titre(critere),taille_titre*sizeof(char));
 	if(noctets < taille_titre*sizeof(char)) {
 		printf("Probleme lors de l'ecriture du champ titre dans le FIFO\n");
 		exit(1);
@@ -52,12 +50,12 @@ void client_envoi_critere(int descripteur_fifo_client_ecriture, t_critere criter
 	 */
 	if (get_genre(critere)){
 		taille_genre=strlen(get_genre(critere))+1;
-		noctets=write(descripteur_fifo_client_ecriture, &taille_genre, sizeof(int));
+		noctets=write(descripteur_socket_client, &taille_genre, sizeof(int));
 		if(noctets < sizeof(int)) {
 			printf("Probleme lors de l'ecriture de la taille du champ genre dans le FIFO\n");
 			exit(1);
 		}
-		noctets=write(descripteur_fifo_client_ecriture,get_genre(critere),taille_genre*sizeof(char));
+		noctets=write(descripteur_socket_client,get_genre(critere),taille_genre*sizeof(char));
 		if(noctets < taille_genre*sizeof(char)) {
 			printf("Probleme lors de l'ecriture du champ genre dans le FIFO\n");
 			exit(1);
@@ -66,12 +64,12 @@ void client_envoi_critere(int descripteur_fifo_client_ecriture, t_critere criter
 	else if (get_genre(critere) == NULL){
 		set_genre(critere,null);
 		taille_genre=strlen(null)+1;
-		noctets=write(descripteur_fifo_client_ecriture, &taille_genre, sizeof(int));
+		noctets=write(descripteur_socket_client, &taille_genre, sizeof(int));
 		if(noctets < sizeof(int)) {
 			printf("Probleme lors de l'ecriture taille du champ genre null dans le FIFO\n");
 			exit(1);
 		}
-		noctets=write(descripteur_fifo_client_ecriture,get_genre(critere),taille_genre*sizeof(char));
+		noctets=write(descripteur_socket_client,get_genre(critere),taille_genre*sizeof(char));
 		if(noctets < taille_genre*sizeof(char)) {
 			printf("Probleme lors de l'ecriture du champ genre nill dans le FIFO\n");
 			exit(1);
@@ -84,12 +82,12 @@ void client_envoi_critere(int descripteur_fifo_client_ecriture, t_critere criter
 	 */
 	if (get_categorie(critere)){
 		taille_categorie=strlen(get_categorie(critere))+1;
-		noctets=write(descripteur_fifo_client_ecriture, &taille_categorie, sizeof(int));
+		noctets=write(descripteur_socket_client, &taille_categorie, sizeof(int));
 		if(noctets < sizeof(int)) {
 			printf("Probleme lors de l'ecriture dans le FIFO\n");
 			exit(1);
 		}
-		noctets=write(descripteur_fifo_client_ecriture,get_categorie(critere),taille_categorie*sizeof(char));
+		noctets=write(descripteur_socket_client,get_categorie(critere),taille_categorie*sizeof(char));
 		if(noctets < taille_categorie*sizeof(char)) {
 			printf("Probleme lors de l'ecriture dans le FIFO\n");
 			exit(1);
@@ -98,12 +96,12 @@ void client_envoi_critere(int descripteur_fifo_client_ecriture, t_critere criter
 	else if (get_categorie(critere) == NULL){
 		set_categorie(critere,null);
 		taille_categorie=strlen(null)+1;
-		noctets=write(descripteur_fifo_client_ecriture, &taille_categorie, sizeof(int));
+		noctets=write(descripteur_socket_client, &taille_categorie, sizeof(int));
 		if(noctets < sizeof(int)) {
 			printf("Probleme lors de l'ecriture dans le FIFO\n");
 			exit(1);
 		}
-		noctets=write(descripteur_fifo_client_ecriture,get_categorie(critere),taille_categorie*sizeof(char));
+		noctets=write(descripteur_socket_client,get_categorie(critere),taille_categorie*sizeof(char));
 		if(noctets < taille_categorie*sizeof(char)) {
 			printf("Probleme lors de l'ecriture dans le FIFO\n");
 			exit(1);
@@ -116,13 +114,13 @@ void client_envoi_critere(int descripteur_fifo_client_ecriture, t_critere criter
 	 */
 	if (get_annee_parution_min(critere) != -1 && get_annee_parution_max(critere) != -1){
 		int annee_min = get_annee_parution_min(critere);
-		noctets=write(descripteur_fifo_client_ecriture, &annee_min , sizeof(int));
+		noctets=write(descripteur_socket_client, &annee_min , sizeof(int));
 		if(noctets < sizeof(int)) {
 			printf("Probleme lors de l'ecriture dans le FIFO\n");
 			exit(1);
 		}
 		int annee_max = get_annee_parution_max(critere);
-		noctets=write(descripteur_fifo_client_ecriture, &annee_max, sizeof(int));
+		noctets=write(descripteur_socket_client, &annee_max, sizeof(int));
 		if(noctets < sizeof(int)) {
 			printf("Probleme lors de l'ecriture dans le FIFO\n");
 			exit(1);
@@ -130,13 +128,13 @@ void client_envoi_critere(int descripteur_fifo_client_ecriture, t_critere criter
 	}
 	else{
 		int annee_min = 0;
-		noctets=write(descripteur_fifo_client_ecriture, &annee_min , sizeof(int));
+		noctets=write(descripteur_socket_client, &annee_min , sizeof(int));
 		if(noctets < sizeof(int)) {
 			printf("Probleme lors de l'ecriture dans le FIFO\n");
 			exit(1);
 		}
 		int annee_max = 0;
-		noctets=write(descripteur_fifo_client_ecriture, &annee_max, sizeof(int));
+		noctets=write(descripteur_socket_client, &annee_max, sizeof(int));
 		if(noctets < sizeof(int)) {
 			printf("Probleme lors de l'ecriture dans le FIFO\n");
 			exit(1);
@@ -144,7 +142,7 @@ void client_envoi_critere(int descripteur_fifo_client_ecriture, t_critere criter
 
 	}
 	int flag = get_evaluation(critere);
-	noctets=write(descripteur_fifo_client_ecriture, &flag, sizeof(int));
+	noctets=write(descripteur_socket_client, &flag, sizeof(int));
 	if(noctets < sizeof(int)) {
 		printf("Probleme lors de l'ecriture dans le FIFO\n");
 		exit(1);
@@ -168,7 +166,7 @@ void client_envoi_critere(int descripteur_fifo_client_ecriture, t_critere criter
 	/* Tube-HLR03 finie */
 }
 
-int client_recoi_resultat(int descripteur_fifo_serveur_lecture ){
+int client_recoi_resultat(int descripteur_socket_serveur ){
 
 	char *titreR = NULL, *genreR = NULL, *categorieR = NULL, *IDr = NULL;
 	int taille_titre;
@@ -183,7 +181,7 @@ int client_recoi_resultat(int descripteur_fifo_serveur_lecture ){
 	/*reception des resultats envoyer par le serveur puis on les affiche */
 	printf("[*] Reception des resultats\n");
 	//On fait la lecture du nombre de resultats reçus
-	noctets = read(descripteur_fifo_serveur_lecture, &nb_titre, sizeof(int));
+	noctets = read(descripteur_socket_serveur, &nb_titre, sizeof(int));
 	if(noctets != sizeof(int)) {
 		printf("Erreur lors de la lecture du nombre de titres venant du serveur\n");
 		exit(1);
@@ -205,7 +203,7 @@ int client_recoi_resultat(int descripteur_fifo_serveur_lecture ){
 		printf("\t[%i] ",i+1);
 
 		//Lecture et affichage du champ ID
-		noctets=read(descripteur_fifo_serveur_lecture, &taille_genre, sizeof(int));
+		noctets=read(descripteur_socket_serveur, &taille_genre, sizeof(int));
 		if(noctets == sizeof(int)) {
 			IDr= malloc(taille_genre*sizeof(char));
 		}
@@ -213,7 +211,7 @@ int client_recoi_resultat(int descripteur_fifo_serveur_lecture ){
 			printf("Erreur lors de la lecture de la taille du champ ID du FIFO\n");
 			exit(1);
 		}
-		noctets=read(descripteur_fifo_serveur_lecture, IDr,taille_genre*sizeof(char));
+		noctets=read(descripteur_socket_serveur, IDr,taille_genre*sizeof(char));
 		if(noctets != taille_genre*sizeof(char)) {
 			printf("Erreur lors de la lecture du champ ID du FIFO\n");
 			exit(1);
@@ -221,7 +219,7 @@ int client_recoi_resultat(int descripteur_fifo_serveur_lecture ){
 		printf("%s\t",IDr);
 
 		//Lecture et affichage du champ categorie
-		noctets = read(descripteur_fifo_serveur_lecture, &taille_categorie, sizeof(int));
+		noctets = read(descripteur_socket_serveur, &taille_categorie, sizeof(int));
 		if(noctets == sizeof(int)) {
 			categorieR = malloc(taille_categorie*sizeof(char));
 		}
@@ -229,7 +227,7 @@ int client_recoi_resultat(int descripteur_fifo_serveur_lecture ){
 			printf("Erreur lors de la lecture de la taille du champ categorie du FIFO\n");
 			exit(1);
 		}
-		noctets = read(descripteur_fifo_serveur_lecture, categorieR ,taille_categorie*sizeof(char));
+		noctets = read(descripteur_socket_serveur, categorieR ,taille_categorie*sizeof(char));
 		if(noctets != taille_categorie*sizeof(char)) {
 			printf("Erreur lors de la lecture du champ categorie du FIFO\n");
 			exit(1);
@@ -237,7 +235,7 @@ int client_recoi_resultat(int descripteur_fifo_serveur_lecture ){
 		printf("%s\t",categorieR);
 
 		//Lecture et affichage du champ titre
-		noctets = read(descripteur_fifo_serveur_lecture, &taille_titre, sizeof(int));
+		noctets = read(descripteur_socket_serveur, &taille_titre, sizeof(int));
 		if(noctets == sizeof(int)) {
 			titreR = malloc(taille_titre*sizeof(char));
 		}
@@ -245,7 +243,7 @@ int client_recoi_resultat(int descripteur_fifo_serveur_lecture ){
 			printf("Erreur lors de la lecture de la taille du champ titre du FIFO\n");
 			exit(1);
 		}
-		noctets = read(descripteur_fifo_serveur_lecture,titreR,taille_titre*sizeof(char));
+		noctets = read(descripteur_socket_serveur,titreR,taille_titre*sizeof(char));
 		if(noctets != taille_titre*sizeof(char)) {
 			printf("Erreur lors de la lecture du champ titre du FIFO\n");
 			exit(1);
@@ -253,7 +251,7 @@ int client_recoi_resultat(int descripteur_fifo_serveur_lecture ){
 		printf("%s\t",titreR);
 
 		//Lecture et affichage de l'annee de parution
-		noctets = read(descripteur_fifo_serveur_lecture, &annee_parution, sizeof(int));
+		noctets = read(descripteur_socket_serveur, &annee_parution, sizeof(int));
 		if(noctets != sizeof(int)) {
 			printf("Erreur lors de la lecture de l'annee de parution du FIFO\n");
 			exit(1);
@@ -261,7 +259,7 @@ int client_recoi_resultat(int descripteur_fifo_serveur_lecture ){
 		printf("%i\t",annee_parution);
 		}
 		//Lecture et affichage du champ genre
-		noctets=read(descripteur_fifo_serveur_lecture, &taille_genre, sizeof(int));
+		noctets=read(descripteur_socket_serveur, &taille_genre, sizeof(int));
 		if(noctets == sizeof(int)) {
 			genreR = malloc(taille_genre*sizeof(char));
 		}
@@ -269,7 +267,7 @@ int client_recoi_resultat(int descripteur_fifo_serveur_lecture ){
 			printf("Erreur lors de la lecture de la taille du champ genre du FIFO\n");
 			exit(1);
 		}
-		noctets=read(descripteur_fifo_serveur_lecture, genreR,taille_genre*sizeof(char));
+		noctets=read(descripteur_socket_serveur, genreR,taille_genre*sizeof(char));
 		if(noctets != taille_genre*sizeof(char)) {
 			printf("Erreur lors de la lecture du champ genre du FIFO\n");
 			exit(1);
@@ -289,7 +287,7 @@ int client_recoi_resultat(int descripteur_fifo_serveur_lecture ){
 
 }
 
-void client_envoi_titre(int descripteur_fifo_client_ecriture, int nb_titre){
+void client_envoi_titre(int descripteur_socket_client, int nb_titre){
 
 	int num_titre;
 	int noctets = 0;
@@ -303,7 +301,7 @@ void client_envoi_titre(int descripteur_fifo_client_ecriture, int nb_titre){
 	}
 	//Lab3 comm-HLR06
 	/* Le client envoie au serveur le titre à évaluer parmi les résultats reçus. */
-	noctets=write(descripteur_fifo_client_ecriture, &num_titre, sizeof(int));
+	noctets=write(descripteur_socket_client, &num_titre, sizeof(int));
 	if(noctets < sizeof(int)) {
 		printf("Probleme lors de l'ecriture du numero de titre dans le FIFO\n");
 		exit(1);
@@ -311,7 +309,7 @@ void client_envoi_titre(int descripteur_fifo_client_ecriture, int nb_titre){
 	//comm-HLR05 finie
 }
 
-void client_recoi_cote(int descripteur_fifo_serveur_lecture){
+void client_recoi_cote(int descripteur_socket_serveur){
 
 	int taille_ID_eval;
 	char* ID_eval;
@@ -324,7 +322,7 @@ void client_recoi_cote(int descripteur_fifo_serveur_lecture){
 
 	//Lab 3 - comm HLR09
 	/* On recoit et affiche les informations du titre a evaluer */
-	noctets=read(descripteur_fifo_serveur_lecture,&taille_ID_eval,sizeof(int));
+	noctets=read(descripteur_socket_serveur,&taille_ID_eval,sizeof(int));
 	if(noctets == sizeof(int)) {
 		ID_eval = malloc(taille_ID_eval*sizeof(char));
 	}
@@ -332,14 +330,14 @@ void client_recoi_cote(int descripteur_fifo_serveur_lecture){
 		printf("Erreur lors de la lecture de la taille du champ ID du FIFO\n");
 		exit(1);
 	}
-	noctets=read(descripteur_fifo_serveur_lecture, ID_eval,taille_ID_eval*sizeof(char));
+	noctets=read(descripteur_socket_serveur, ID_eval,taille_ID_eval*sizeof(char));
 	if(noctets != taille_ID_eval*sizeof(char)) {
 		printf("Erreur lors de la lecture du champ ID du FIFO\n");
 		exit(1);
 	}
 	printf("\t- Titre: %s\n",ID_eval);
 
-	noctets=read(descripteur_fifo_serveur_lecture,&taille_cote_eval,sizeof(int));
+	noctets=read(descripteur_socket_serveur,&taille_cote_eval,sizeof(int));
 	if(noctets == sizeof(int)) {
 		cote_eval = malloc(taille_cote_eval*sizeof(char));
 	}
@@ -347,14 +345,14 @@ void client_recoi_cote(int descripteur_fifo_serveur_lecture){
 		printf("Erreur lors de la lecture de la taille du champ cote du FIFO\n");
 		exit(1);
 	}
-	noctets=read(descripteur_fifo_serveur_lecture, cote_eval,taille_cote_eval*sizeof(char));
+	noctets=read(descripteur_socket_serveur, cote_eval,taille_cote_eval*sizeof(char));
 	if(noctets != taille_cote_eval*sizeof(char)) {
 		printf("Erreur lors de la lecture du champ cote du FIFO\n");
 		exit(1);
 	}
 	printf("\t- Cote moyenne: %s /10 \n",cote_eval);
 
-	noctets = read(descripteur_fifo_serveur_lecture, &nb_vote_eval, sizeof(int));
+	noctets = read(descripteur_socket_serveur, &nb_vote_eval, sizeof(int));
 	if(noctets != sizeof(int)) {
 		printf("Erreur lors de la lecture du nombre de vote du FIFO\n");
 		exit(1);
@@ -366,7 +364,7 @@ void client_recoi_cote(int descripteur_fifo_serveur_lecture){
 	free(cote_eval);
 }
 
-void client_envoi_cote(int descripteur_fifo_client_ecriture){
+void client_envoi_cote(int descripteur_socket_client){
 
 	int noctets = 0;
 	float note;
@@ -382,7 +380,7 @@ void client_envoi_cote(int descripteur_fifo_client_ecriture){
 		scanf("%f",&note);
 	}
 	//On envoi la note au serveur
-	noctets=write(descripteur_fifo_client_ecriture, &note, sizeof(float));
+	noctets=write(descripteur_socket_client, &note, sizeof(float));
 	if(noctets < sizeof(float)) {
 		printf("Probleme lors de l'ecriture de la note dans le FIFO\n");
 		exit(1);
@@ -390,7 +388,7 @@ void client_envoi_cote(int descripteur_fifo_client_ecriture){
 	}
 }
 
-void client_recoit_nouvelle_cote(int descripteur_fifo_serveur_lecture){
+void client_recoit_nouvelle_cote(int descripteur_socket_serveur){
 
 	int noctets = 0;
     int taille_ID;
@@ -402,7 +400,7 @@ void client_recoit_nouvelle_cote(int descripteur_fifo_serveur_lecture){
 	//Lab 3 comm-HLR13
 	/* On recoit et affiche les nouvelles informations*/
 
-	noctets=read(descripteur_fifo_serveur_lecture,&taille_ID,sizeof(int));
+	noctets=read(descripteur_socket_serveur,&taille_ID,sizeof(int));
 	if(noctets == sizeof(int)) {
 		ID = malloc(taille_ID*sizeof(char));
 	}
@@ -410,14 +408,14 @@ void client_recoit_nouvelle_cote(int descripteur_fifo_serveur_lecture){
 		printf("Erreur lors de la lecture de la taille du champ ID du FIFO\n");
 		exit(1);
 	}
-	noctets=read(descripteur_fifo_serveur_lecture,ID,taille_ID*sizeof(char));
+	noctets=read(descripteur_socket_serveur,ID,taille_ID*sizeof(char));
 	if(noctets != taille_ID*sizeof(char)) {
 		printf("Erreur lors de la lecture du champ ID du FIFO\n");
 		exit(1);
 	}
 	printf("\t- Titre: %s\n",ID);
 
-	noctets=read(descripteur_fifo_serveur_lecture,&taille_cote,sizeof(int));
+	noctets=read(descripteur_socket_serveur,&taille_cote,sizeof(int));
 	if(noctets == sizeof(int)) {
 		nouvelle_cote = malloc(taille_cote*sizeof(char));
 	}
@@ -425,14 +423,14 @@ void client_recoit_nouvelle_cote(int descripteur_fifo_serveur_lecture){
 		printf("Erreur lors de la lecture de la taille du champ cote du FIFO\n");
 		exit(1);
 	}
-	noctets=read(descripteur_fifo_serveur_lecture, nouvelle_cote,taille_cote*sizeof(char));
+	noctets=read(descripteur_socket_serveur, nouvelle_cote,taille_cote*sizeof(char));
 	if(noctets != taille_cote*sizeof(char)) {
 		printf("Erreur lors de la lecture du champ cote du FIFO\n");
 		exit(1);
 	}
 	printf("\t- Nouvelle cote moyenne: %s /10 \n",nouvelle_cote);
 
-	noctets = read(descripteur_fifo_serveur_lecture, &nb_vote, sizeof(int));
+	noctets = read(descripteur_socket_serveur, &nb_vote, sizeof(int));
 	if(noctets != sizeof(int)) {
 		printf("Erreur lors de la lecture du nombre de vote du FIFO\n");
 		exit(1);

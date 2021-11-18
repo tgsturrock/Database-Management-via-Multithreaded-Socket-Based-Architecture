@@ -25,30 +25,69 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
+
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <string.h>
 
-#define FIFO_CLIENT_LECTURE "/tmp/fifo1"
-#define FIFO_SERVEUR_ECRITURE "/tmp/fifo2"
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <pthread.h>
+#include <semaphore.h>
+
+pthread_mutex_t lock;
 
 
 int main(int argc, char *argv[]) {
+	int noctets = 0;
+	int descripteur_socket_serveur, descripteur_socket_client;
+	unsigned int taille_adresse_serveur, taille_adresse_client;
+	struct sockaddr_in adresse_serveur, adresse_client;
+	int status;
+	pid_t* pid = NULL;
 
-	int descripteur_fifo_client_lecture;
-	int descripteur_fifo_serveur_ecriture;
-	int noctets=0;
+
 	int num_titre;
-
 	float cote;
 
-	//Demarage du serveur
-	serveur_demarage();
 
-	//Ouverture des fifos du cote serveur
-	descripteur_fifo_client_lecture = open(FIFO_CLIENT_LECTURE, O_RDONLY);
-	descripteur_fifo_serveur_ecriture = open(FIFO_SERVEUR_ECRITURE, O_WRONLY);
+	/**
+	 * Lab4 comm-HLR01
+	 * Le client et le serveur doivent communiquer par l'entremise de sockets.
+	 */
+	/* creer un socket pour le serveur */
+	descripteur_socket_serveur = socket(AF_INET, SOCK_STREAM, 0);
+
+	if (descripteur_socket_serveur == -1)
+    {
+        printf("Echec lors de la creation du socker serveur");
+    }
+    puts("Socket cree");
+
+	  /* relier le socket a l'adresse IP de l'hote et au port choisi */
+	adresse_serveur.sin_family = AF_INET; /* On va etablir une communication TCP/IP */
+	adresse_serveur.sin_addr.s_addr = inet_addr("127.0.0.1"); /* l'adresse IP de l'hote du serveur */
+	adresse_serveur.sin_port = htons(10001);
+	taille_adresse_serveur = sizeof(adresse_serveur);
+	status = bind(descripteur_socket_serveur, (struct sockaddr *)&adresse_serveur, taille_adresse_serveur);
+	if(status == -1) {
+		printf("Échec lors de la configuration du socket serveur\n");
+	}
+
+	listen(descripteur_socket_serveur, 10);
+
+	while(1) {
+
+	    printf("En attente de clients...\n");
+
+	    /* Accepter une connexion en provenance d'un client */
+	    descripteur_socket_client = accept(descripteur_socket_serveur, (struct sockaddr *)&adresse_client, &taille_adresse_client);
+
+	    printf("Connexion etablie avec un client a l'adresse IP %s\n", inet_ntoa(adresse_client.sin_addr));
+
+	}
 
 	//On affiche que la connection est etablie
 	printf("[!] Connexion avec le client établie\n");
@@ -57,7 +96,7 @@ int main(int argc, char *argv[]) {
 	t_critere critere = creer_critere();
 
 	//Le serveur recoit les critere de recherche envoye par le client
-	serveur_recoit_critere(descripteur_fifo_client_lecture, critere);
+	serveur_recoit_critere(descripteur_socket_client, critere);
 	/* Tube-HLR03 finie */
 
 	//Recherche dans la base de donnee pour des titre qui concorde avec les criteres de recherche
@@ -74,14 +113,14 @@ int main(int argc, char *argv[]) {
 	//HLR25 finie
 
 
-	serveur_envoit_resultat(descripteur_fifo_serveur_ecriture, resultat);
+	serveur_envoit_resultat(descripteur_socket_serveur, resultat);
 
 	//Lab3 comm-HLR07
 	/*Si le champ relié à l'argument -v a bien été reçu lors du requis Comm-HLR02,
 	 *le serveur est capable de récupérer le titre à évaluer par le client.*/
 	if(get_evaluation(critere) == 1){
 
-		noctets = read(descripteur_fifo_client_lecture, &num_titre, sizeof(int));
+		noctets = read(descripteur_socket_client, &num_titre, sizeof(int));
 		if(noctets != sizeof(int)) {
 			printf("Erreur lors de la lecture du numero de titre a evaluer \n");
 			exit(1);
@@ -94,14 +133,14 @@ int main(int argc, char *argv[]) {
 		printf("[*] Titre a evaluer:\n");
 		titre_chercher = print_titre(resultat,(num_titre-1));
 		//Le serveur envoise la cote du titre demande
-		serveur_envoi_cote(descripteur_fifo_serveur_ecriture, titre_chercher);
+		serveur_envoi_cote(descripteur_socket_serveur, titre_chercher);
 		//comm-HLR08 finie
 
 
 		//Lab3 comm-HLR11
 		/*Le serveur est capable de recevoir la note sur 10 du client
 		 *et de calculer la nouvelle cote de classement du titre évalué.*/
-		noctets = read(descripteur_fifo_client_lecture, &cote , sizeof(float));
+		noctets = read(descripteur_socket_client, &cote , sizeof(float));
 		if(noctets < sizeof(float)) {
 			printf("Probleme lors de la lecture de la cote envoyer par l'usager dans le FIFO\n");
 			exit(1);
@@ -109,7 +148,7 @@ int main(int argc, char *argv[]) {
 		fichier_cote(titre_chercher, cote);
 		//comm-HLR11 finie
 
-		serveur_envoi_nouvcote(descripteur_fifo_serveur_ecriture, titre_chercher);
+		serveur_envoi_nouvcote(descripteur_socket_serveur, titre_chercher);
 
 	}
 	//Tube-HLR04 finie
@@ -120,10 +159,9 @@ int main(int argc, char *argv[]) {
 	detruire_critere(critere);
 
 
-	close(descripteur_fifo_serveur_ecriture);
-	close(descripteur_fifo_client_lecture);
-	unlink(FIFO_SERVEUR_ECRITURE);
-	unlink(FIFO_CLIENT_LECTURE);
+	close(descripteur_socket_serveur);
+	close(descripteur_socket_client);
+	//comm-HLR01 finie
 	printf("[-] Fermeture du serveur.\n");
 	return 0;
 }

@@ -29,20 +29,24 @@
 #include <sys/stat.h>
 #include <string.h>
 
-#define FIFO_CLIENT_ECRITURE "/tmp/fifo1"
-#define FIFO_SERVEUR_LECTURE "/tmp/fifo2"
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <pthread.h>
+#include <semaphore.h>
+
+
 
 
 int main(int argc, char *argv[]) {
 	char *titre = NULL, *genre = NULL, *annees = NULL, *categorie = NULL;
-	int descripteur_fifo_client_ecriture;
-	int descripteur_fifo_serveur_lecture;
-	int noctets=0;
-	char null[2] = "0";
+	int descripteur_socket_client,descripteur_socket_serveur;
+	unsigned int taille_adresse_serveur;
+	struct sockaddr_in adresse_serveur;
+	int success;
 
-	int taille_titre;
-	int taille_genre;
-	int taille_categorie;
+
+	char null[2] = "0";
 	int nb_titre;
 
 
@@ -73,15 +77,9 @@ int main(int argc, char *argv[]) {
 			genre = argv[optind];
 			optind++;
 			break;
-			//Lab3-HLR03
-			/*
-			 * Argument -v qui permet a l'utilisateur
-			 * de demander a evaluer un titre
-			 */
 		case 'v':
 			flag = 1;
 			break;
-			//HLR03 finie
 		case ':':
 			printf ("Veuillez entree une valeur pour l'option desire\n");
 			break;
@@ -96,12 +94,10 @@ int main(int argc, char *argv[]) {
 		printf("extra arguments: %s\n", argv[optind]);
 	}
 	//On s<assure qu'au moins un titre est passe en parametre
-	if(titre == NULL){
-		printf ("Veuillez saisir un titre\n");
-		return 0;
+	while(titre == NULL){
+		printf ("[!] Veuillez saisir un titre\n");
+		scanf("%s", &titre);
 	}
-	//client-HLR02 finie
-
 
 	// Création de la structure critere et stockage des arguments reçus
 	t_critere critere = creer_critere();
@@ -128,40 +124,56 @@ int main(int argc, char *argv[]) {
 	if(flag == 1)
 		set_evaluation(critere, flag);
 
-	/*Lab3 Tube-HLR01 On envoi les criteres de recherche en les ecrivant dans un FIFO*/
-	//Ouverture des fifos pour communiquer avec le serveur
-	descripteur_fifo_client_ecriture = open(FIFO_CLIENT_ECRITURE,O_WRONLY);
-	descripteur_fifo_serveur_lecture = open(FIFO_SERVEUR_LECTURE, O_RDONLY);
-	//On indique que la connection a ete etablie avec le serveur
-	printf("[*] Connection etablie avec le serveur.\n");
+	/**
+	 * Lab4 comm-HLR01
+	 * Le client et le serveur doivent communiquer par l'entremise de sockets.
+	 */
+	  /* creer un socket pour le client */
+	descripteur_socket_client = socket(AF_INET, SOCK_STREAM, 0);
+	  /* paramètres de connexion au serveur */
+	  adresse_serveur.sin_family = AF_INET;
+	  adresse_serveur.sin_addr.s_addr = inet_addr("127.0.0.1");
+	  adresse_serveur.sin_port = htons(10001);
+	  taille_adresse_serveur = sizeof(adresse_serveur);
+
+	  /* connecter le socket du client au socket du serveur */
+	  printf("[*] Tentative de connexion au serveur...\n");
+	  success = connect(descripteur_socket_client, (struct sockaddr*)&adresse_serveur, taille_adresse_serveur);
+
+	  if(success == -1) {
+	    printf("[!] Échec lors de la connexion au serveur\n");
+	    exit(1);
+	  } else {
+	    printf("[*] Client connecté au serveur avec succès\n");
+	  }
 
 
 	//Le client envoi les criteres de recherche
-	client_envoi_critere(descripteur_fifo_client_ecriture, critere);
+	client_envoi_critere(descripteur_socket_client, critere);
 
 	//Le client recoit les resultat envoye par le serveur et conserve la valeur du nombre de titre
-	nb_titre = client_recoi_resultat(descripteur_fifo_serveur_lecture);
+	nb_titre = client_recoi_resultat(descripteur_socket_serveur);
 
 	//Lab3 comm-HLR05
 	/*Si l'argument -v a été donné par l'utilisateur, le client doit demander à l'utilisateur
 	 *quel titre désire-t-il évaluer dans la liste des résultats reçus du serveur.*/
 	if(get_evaluation(critere) == 1){
 
-		client_envoi_titre(descripteur_fifo_client_ecriture, nb_titre);
+		client_envoi_titre(descripteur_socket_client, nb_titre);
 
-		client_recoi_cote(descripteur_fifo_serveur_lecture);
+		client_recoi_cote(descripteur_socket_serveur);
 
-		client_envoi_cote(descripteur_fifo_client_ecriture);
+		client_envoi_cote(descripteur_socket_client);
 
-		client_recoit_nouvelle_cote(descripteur_fifo_serveur_lecture);
+		client_recoit_nouvelle_cote(descripteur_socket_serveur);
 
 	}
 	//comm-HLR06 finie
 
 	//On desaloue la memoire dedier au criteres de recherche
 	detruire_critere(critere);
-	close(descripteur_fifo_client_ecriture);
-	close(descripteur_fifo_serveur_lecture);
+	close(descripteur_socket_client);
+	close(descripteur_socket_serveur);
 	printf("[-] Fermeture de l'application.\n");
 
 	return 0;
