@@ -4,7 +4,7 @@
  *  Par : Thomas Giguere Sturrock, Ylann Blouzat
  *  Created on: 15 nov. 2021
  *
- *  Programme qui communique avec un client. Le serveur interagie avec un base de donnees
+ *  Programme qui communique un serveur. Le serveur interagie avec un base de donnees
  *  afin de pouvoir tirer de l'information et/ou lui apporter des modifications selon la demande
  *  du client.
  *

@@ -20,6 +20,7 @@
  * client-HLR01 finie
  */
 #include "recherche.h"
+#include "comm.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -138,250 +139,12 @@ int main(int argc, char *argv[]) {
 	//On indique que la connection a ete etablie avec le serveur
 	printf("[*] Connection etablie avec le serveur.\n");
 
-	//Lab3 comm-HLR01
-	/*Le client envoie une operation de recherche au serveur ou les criteres sont inclus */
-	//On envois le champ titre et sa taille au serveur
-	taille_titre=strlen(get_titre(critere))+1;
-	noctets=write(descripteur_fifo_client_ecriture, &taille_titre, sizeof(int));
-	if(noctets < sizeof(int)) {
-		printf("Probleme lors de l'ecriture de la taille du champ titre dans le FIFO\n");
-		exit(1);
-	}
-	noctets=write(descripteur_fifo_client_ecriture,get_titre(critere),taille_titre*sizeof(char));
-	if(noctets < taille_titre*sizeof(char)) {
-		printf("Probleme lors de l'ecriture du champ titre dans le FIFO\n");
-		exit(1);
-	}
 
-	/*
-	 * Si le critere genre est present on l'envoit avec sa taille au serveur sinon on envois une valeur
-	 * "null" pour indiquer au serveur qu'aucun genre a ete specifier par l'usage.
-	 */
-	if (genre){
-		taille_genre=strlen(get_genre(critere))+1;
-		noctets=write(descripteur_fifo_client_ecriture, &taille_genre, sizeof(int));
-		if(noctets < sizeof(int)) {
-			printf("Probleme lors de l'ecriture de la taille du champ genre dans le FIFO\n");
-			exit(1);
-		}
-		noctets=write(descripteur_fifo_client_ecriture,get_genre(critere),taille_genre*sizeof(char));
-		if(noctets < taille_genre*sizeof(char)) {
-			printf("Probleme lors de l'ecriture du champ genre dans le FIFO\n");
-			exit(1);
-		}
-	}
-	else if (genre == NULL){
-		genre = null;
-		taille_genre=strlen(null)+1;
-		noctets=write(descripteur_fifo_client_ecriture, &taille_genre, sizeof(int));
-		if(noctets < sizeof(int)) {
-			printf("Probleme lors de l'ecriture taille du champ genre null dans le FIFO\n");
-			exit(1);
-		}
-		noctets=write(descripteur_fifo_client_ecriture,get_genre(critere),taille_genre*sizeof(char));
-		if(noctets < taille_genre*sizeof(char)) {
-			printf("Probleme lors de l'ecriture du champ genre nill dans le FIFO\n");
-			exit(1);
-		}
-	}
-
-	/*
-	 * Si le critere categorie est présente on l'envoit avec sa taille au serveur sinon on envois une valeur
-	 * "null" pour indiquer au serveur qu'aucune categorie a ete specifier par l'usage.
-	 */
-	if (categorie){
-		taille_categorie=strlen(get_categorie(critere))+1;
-		noctets=write(descripteur_fifo_client_ecriture, &taille_categorie, sizeof(int));
-		if(noctets < sizeof(int)) {
-			printf("Probleme lors de l'ecriture dans le FIFO\n");
-			exit(1);
-		}
-		noctets=write(descripteur_fifo_client_ecriture,get_categorie(critere),taille_categorie*sizeof(char));
-		if(noctets < taille_categorie*sizeof(char)) {
-			printf("Probleme lors de l'ecriture dans le FIFO\n");
-			exit(1);
-		}
-	}
-	else if (categorie == NULL){
-		categorie = null;
-		taille_categorie=strlen(null)+1;
-		noctets=write(descripteur_fifo_client_ecriture, &taille_categorie, sizeof(int));
-		if(noctets < sizeof(int)) {
-			printf("Probleme lors de l'ecriture dans le FIFO\n");
-			exit(1);
-		}
-		noctets=write(descripteur_fifo_client_ecriture,get_categorie(critere),taille_categorie*sizeof(char));
-		if(noctets < taille_categorie*sizeof(char)) {
-			printf("Probleme lors de l'ecriture dans le FIFO\n");
-			exit(1);
-		}
-	}
-
-	/*
-	 * Si des annees de parution sont présentes dans les critères on les envoit au serveur sinon on envois
-	 * des valeurs "null" pour indiquer au serveur qu'aucune annee de parution a ete specifier par l'usage.
-	 */
-	if (annees){
-		int annee_min = get_annee_parution_min(critere);
-		noctets=write(descripteur_fifo_client_ecriture, &annee_min , sizeof(int));
-		if(noctets < sizeof(int)) {
-			printf("Probleme lors de l'ecriture dans le FIFO\n");
-			exit(1);
-		}
-		int annee_max = get_annee_parution_max(critere);
-		noctets=write(descripteur_fifo_client_ecriture, &annee_max, sizeof(int));
-		if(noctets < sizeof(int)) {
-			printf("Probleme lors de l'ecriture dans le FIFO\n");
-			exit(1);
-		}
-	}
-	else if(annees == NULL){
-		int annee_min = 0;
-		noctets=write(descripteur_fifo_client_ecriture, &annee_min , sizeof(int));
-		if(noctets < sizeof(int)) {
-			printf("Probleme lors de l'ecriture dans le FIFO\n");
-			exit(1);
-		}
-		int annee_max = 0;
-		noctets=write(descripteur_fifo_client_ecriture, &annee_max, sizeof(int));
-		if(noctets < sizeof(int)) {
-			printf("Probleme lors de l'ecriture dans le FIFO\n");
-			exit(1);
-		}
-
-	}
-
-	noctets=write(descripteur_fifo_client_ecriture, &flag, sizeof(int));
-	if(noctets < sizeof(int)) {
-		printf("Probleme lors de l'ecriture dans le FIFO\n");
-		exit(1);
-	}
-	// Tube-HLR01 finie
-	// Comm-HLR01 finie
-
-	/*Lab3 Tube-HLR03 : On verifie le fonctionnement on affichant les champs du critere envoyer par le client*/
-	printf("[*] Envoi des criteres de recherche:\n");
-	printf("\t[+] Titre: %s\n", get_titre(critere));
-	if (genre != null){
-		printf("\t[+] Genre: %s\n", get_genre(critere));
-	}
-	if (categorie != null){
-		printf("\t[+] Categorie: %s\n", get_categorie(critere));
-	}
-	if (annees){
-		printf("\t[+] Annee_min: %i\n", get_annee_parution_min(critere));
-		printf("\t[+] Annee_max: %i\n", get_annee_parution_max(critere));
-	}
-	/* Tube-HLR03 finie */
-
-	detruire_critere(critere);
-
-	//Lab3 Tube-HLR04
-	/*reception des resultats envoyer par le serveur puis on les affiche */
-	printf("[*] Reception des resultats\n");
-	//On fait la lecture du nombre de resultats reçus
-	noctets = read(descripteur_fifo_serveur_lecture, &nb_titre, sizeof(int));
-	if(noctets != sizeof(int)) {
-		printf("Erreur lors de la lecture du nombre de titres venant du serveur\n");
-		exit(1);
-	}
-	//On affiche le nombre de résultats reçus
-	printf("\t[+] %d résultats reçus\n ", nb_titre);
-
-	int i=0;//variable servant comme compteur
-	/*
-	 * Pour chaque resultats reçus on affiche ses champs a l'usager
-	 */
-
-	//Lab3 comm-HLR04
-	/*Le client est capable de recuperer les resultats de recherche envoyes par le serveur
-	 *et de les afficher a l<utilisateur*/
-	while(i<nb_titre){
-
-		printf("\t[%i] ",i+1);
-
-		//Lecture et affichage du champ ID
-		noctets=read(descripteur_fifo_serveur_lecture, &taille_genre, sizeof(int));
-		if(noctets == sizeof(int)) {
-			IDr= malloc(taille_genre*sizeof(char));
-		}
-		else {
-			printf("Erreur lors de la lecture de la taille du champ ID du FIFO\n");
-			exit(1);
-		}
-		noctets=read(descripteur_fifo_serveur_lecture, IDr,taille_genre*sizeof(char));
-		if(noctets != taille_genre*sizeof(char)) {
-			printf("Erreur lors de la lecture du champ ID du FIFO\n");
-			exit(1);
-		}
-		printf("%s\t",IDr);
-
-		//Lecture et affichage du champ categorie
-		noctets = read(descripteur_fifo_serveur_lecture, &taille_categorieR, sizeof(int));
-		if(noctets == sizeof(int)) {
-			categorieR = malloc(taille_categorieR*sizeof(char));
-		}
-		else {
-			printf("Erreur lors de la lecture de la taille du champ categorie du FIFO\n");
-			exit(1);
-		}
-		noctets = read(descripteur_fifo_serveur_lecture, categorieR ,taille_categorieR*sizeof(char));
-		if(noctets != taille_categorieR*sizeof(char)) {
-			printf("Erreur lors de la lecture du champ categorie du FIFO\n");
-			exit(1);
-		}
-		printf("%s\t",categorieR);
-
-		//Lecture et affichage du champ titre
-		noctets = read(descripteur_fifo_serveur_lecture, &taille_titreR, sizeof(int));
-		if(noctets == sizeof(int)) {
-			titreR = malloc(taille_titreR*sizeof(char));
-		}
-		else {
-			printf("Erreur lors de la lecture de la taille du champ titre du FIFO\n");
-			exit(1);
-		}
-		noctets = read(descripteur_fifo_serveur_lecture,titreR,taille_titreR*sizeof(char));
-		if(noctets != taille_titreR*sizeof(char)) {
-			printf("Erreur lors de la lecture du champ titre du FIFO\n");
-			exit(1);
-		}
-		printf("%s\t",titreR);
-
-		//Lecture et affichage de l'annee de parution
-		noctets = read(descripteur_fifo_serveur_lecture, &annee_parution_min_r, sizeof(int));
-		if(noctets != sizeof(int)) {
-			printf("Erreur lors de la lecture de l'annee de parution du FIFO\n");
-			exit(1);
-		}else{
-		printf("%i\t",annee_parution_min_r);
-		}
-		//Lecture et affichage du champ genre
-		noctets=read(descripteur_fifo_serveur_lecture, &taille_genreR, sizeof(int));
-		if(noctets == sizeof(int)) {
-			genreR = malloc(taille_genreR*sizeof(char));
-		}
-		else {
-			printf("Erreur lors de la lecture de la taille du champ genre du FIFO\n");
-			exit(1);
-		}
-		noctets=read(descripteur_fifo_serveur_lecture, genreR,taille_genreR*sizeof(char));
-		if(noctets != taille_genreR*sizeof(char)) {
-			printf("Erreur lors de la lecture du champ genre du FIFO\n");
-			exit(1);
-		}
-		printf("%s\n",genreR);
+	//Le client envoi les criteres de recherche
+	client_envoi_critere(descripteur_fifo_client_ecriture, critere);
 
 
-		free(IDr);
-		free(categorieR);
-		free(titreR);
-		free(genreR);
-		i++;
-	}
-    // Tube-HLR04 finie
-	// comm-HLR04 finie
-
+	client_recoi_resultat(descripteur_fifo_serveur_lecture);
 
 	int num_titre;
 	int taille_ID_eval;
@@ -398,7 +161,7 @@ int main(int argc, char *argv[]) {
 	//Lab3 comm-HLR05
 	/*Si l'argument -v a été donné par l'utilisateur, le client doit demander à l'utilisateur
 	 *quel titre désire-t-il évaluer dans la liste des résultats reçus du serveur.*/
-	if(flag==1){
+	if(get_evaluation(critere) == 1){
 		printf("[-] Veuillez choisir un titre a evaluer\n  >  ");
 		scanf("%i",&num_titre);
 
@@ -522,6 +285,8 @@ int main(int argc, char *argv[]) {
 	}
 	//comm-HLR06 finie
 
+	//On desaloue la memoire dedier au criteres de recherche
+	detruire_critere(critere);
 	close(descripteur_fifo_client_ecriture);
 	close(descripteur_fifo_serveur_lecture);
 	printf("[-] Fermeture de l'application.\n");
