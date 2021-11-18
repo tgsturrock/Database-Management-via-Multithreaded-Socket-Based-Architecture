@@ -40,7 +40,7 @@
 
 int main(int argc, char *argv[]) {
 	char *titre = NULL, *genre = NULL, *annees = NULL, *categorie = NULL;
-	int descripteur_socket_client,descripteur_socket_serveur;
+	int descripteur_socket_client;
 	unsigned int taille_adresse_serveur;
 	struct sockaddr_in adresse_serveur;
 	int success;
@@ -48,15 +48,15 @@ int main(int argc, char *argv[]) {
 
 	char null[2] = "0";
 	int nb_titre;
-
+	int flag = 0;
 
 	//Lab3 client-HLR02
-	/*
+	/**
 	 * On se sert de getopt afin de passer au travers du tableau argv pour retrouver les arguments passer en parametere
 	 * afin d'associer des valeurs au chanps qui sont associees a ces arguments.
 	 */
+
 	int opt;//variable servant a passer d'un argument a l'autre.
-	int flag = 0;
 	while((opt = getopt(argc, argv, ":tcagv")) != -1)
 	{
 		switch(opt)
@@ -98,7 +98,6 @@ int main(int argc, char *argv[]) {
 		printf ("[!] Veuillez saisir un titre\n");
 		scanf("%s", &titre);
 	}
-
 	// Création de la structure critere et stockage des arguments reçus
 	t_critere critere = creer_critere();
 	/**
@@ -128,31 +127,31 @@ int main(int argc, char *argv[]) {
 	 * Lab4 comm-HLR01
 	 * Le client et le serveur doivent communiquer par l'entremise de sockets.
 	 */
-	  /* creer un socket pour le client */
+	/* creer un socket pour le client */
 	descripteur_socket_client = socket(AF_INET, SOCK_STREAM, 0);
-	  /* paramètres de connexion au serveur */
-	  adresse_serveur.sin_family = AF_INET;
-	  adresse_serveur.sin_addr.s_addr = inet_addr("127.0.0.1");
-	  adresse_serveur.sin_port = htons(10001);
-	  taille_adresse_serveur = sizeof(adresse_serveur);
+	/* paramètres de connexion au serveur */
+	adresse_serveur.sin_family = AF_INET;
+	adresse_serveur.sin_addr.s_addr = inet_addr("127.0.0.1");
+	adresse_serveur.sin_port = htons(10001);
+	taille_adresse_serveur = sizeof(adresse_serveur);
 
-	  /* connecter le socket du client au socket du serveur */
-	  printf("[*] Tentative de connexion au serveur...\n");
-	  success = connect(descripteur_socket_client, (struct sockaddr*)&adresse_serveur, taille_adresse_serveur);
+	/* connecter le socket du client au socket du serveur */
+	printf("[*] Tentative de connexion au serveur...\n");
+	success = connect(descripteur_socket_client, (struct sockaddr*)&adresse_serveur, taille_adresse_serveur);
 
-	  if(success == -1) {
-	    printf("[!] Échec lors de la connexion au serveur\n");
-	    exit(1);
-	  } else {
-	    printf("[*] Client connecté au serveur avec succès\n");
-	  }
+	if(success == -1) {
+		printf("[!] Échec lors de la connexion au serveur\n");
+		exit(1);
+	} else {
+		printf("[*] Client connecté au serveur avec succès\n");
+	}
 
 
 	//Le client envoi les criteres de recherche
 	client_envoi_critere(descripteur_socket_client, critere);
 
 	//Le client recoit les resultat envoye par le serveur et conserve la valeur du nombre de titre
-	nb_titre = client_recoi_resultat(descripteur_socket_serveur);
+	nb_titre = client_recoi_resultat(descripteur_socket_client);
 
 	//Lab3 comm-HLR05
 	/*Si l'argument -v a été donné par l'utilisateur, le client doit demander à l'utilisateur
@@ -161,11 +160,11 @@ int main(int argc, char *argv[]) {
 
 		client_envoi_titre(descripteur_socket_client, nb_titre);
 
-		client_recoi_cote(descripteur_socket_serveur);
+		client_recoi_cote(descripteur_socket_client);
 
 		client_envoi_cote(descripteur_socket_client);
 
-		client_recoit_nouvelle_cote(descripteur_socket_serveur);
+		client_recoit_nouvelle_cote(descripteur_socket_client);
 
 	}
 	//comm-HLR06 finie
@@ -173,7 +172,8 @@ int main(int argc, char *argv[]) {
 	//On desaloue la memoire dedier au criteres de recherche
 	detruire_critere(critere);
 	close(descripteur_socket_client);
-	close(descripteur_socket_serveur);
+	//comm-HLR01 finie
+
 	printf("[-] Fermeture de l'application.\n");
 
 	return 0;

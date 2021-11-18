@@ -166,7 +166,7 @@ void client_envoi_critere(int descripteur_socket_client, t_critere critere){
 	/* Tube-HLR03 finie */
 }
 
-int client_recoi_resultat(int descripteur_socket_serveur ){
+int client_recoi_resultat(int descripteur_socket_client ){
 
 	char *titreR = NULL, *genreR = NULL, *categorieR = NULL, *IDr = NULL;
 	int taille_titre;
@@ -181,7 +181,7 @@ int client_recoi_resultat(int descripteur_socket_serveur ){
 	/*reception des resultats envoyer par le serveur puis on les affiche */
 	printf("[*] Reception des resultats\n");
 	//On fait la lecture du nombre de resultats reçus
-	noctets = read(descripteur_socket_serveur, &nb_titre, sizeof(int));
+	noctets = read(descripteur_socket_client, &nb_titre, sizeof(int));
 	if(noctets != sizeof(int)) {
 		printf("Erreur lors de la lecture du nombre de titres venant du serveur\n");
 		exit(1);
@@ -203,7 +203,7 @@ int client_recoi_resultat(int descripteur_socket_serveur ){
 		printf("\t[%i] ",i+1);
 
 		//Lecture et affichage du champ ID
-		noctets=read(descripteur_socket_serveur, &taille_genre, sizeof(int));
+		noctets=read(descripteur_socket_client, &taille_genre, sizeof(int));
 		if(noctets == sizeof(int)) {
 			IDr= malloc(taille_genre*sizeof(char));
 		}
@@ -211,7 +211,7 @@ int client_recoi_resultat(int descripteur_socket_serveur ){
 			printf("Erreur lors de la lecture de la taille du champ ID du FIFO\n");
 			exit(1);
 		}
-		noctets=read(descripteur_socket_serveur, IDr,taille_genre*sizeof(char));
+		noctets=read(descripteur_socket_client, IDr,taille_genre*sizeof(char));
 		if(noctets != taille_genre*sizeof(char)) {
 			printf("Erreur lors de la lecture du champ ID du FIFO\n");
 			exit(1);
@@ -219,7 +219,7 @@ int client_recoi_resultat(int descripteur_socket_serveur ){
 		printf("%s\t",IDr);
 
 		//Lecture et affichage du champ categorie
-		noctets = read(descripteur_socket_serveur, &taille_categorie, sizeof(int));
+		noctets = read(descripteur_socket_client, &taille_categorie, sizeof(int));
 		if(noctets == sizeof(int)) {
 			categorieR = malloc(taille_categorie*sizeof(char));
 		}
@@ -227,7 +227,7 @@ int client_recoi_resultat(int descripteur_socket_serveur ){
 			printf("Erreur lors de la lecture de la taille du champ categorie du FIFO\n");
 			exit(1);
 		}
-		noctets = read(descripteur_socket_serveur, categorieR ,taille_categorie*sizeof(char));
+		noctets = read(descripteur_socket_client, categorieR ,taille_categorie*sizeof(char));
 		if(noctets != taille_categorie*sizeof(char)) {
 			printf("Erreur lors de la lecture du champ categorie du FIFO\n");
 			exit(1);
@@ -235,7 +235,7 @@ int client_recoi_resultat(int descripteur_socket_serveur ){
 		printf("%s\t",categorieR);
 
 		//Lecture et affichage du champ titre
-		noctets = read(descripteur_socket_serveur, &taille_titre, sizeof(int));
+		noctets = read(descripteur_socket_client, &taille_titre, sizeof(int));
 		if(noctets == sizeof(int)) {
 			titreR = malloc(taille_titre*sizeof(char));
 		}
@@ -243,7 +243,7 @@ int client_recoi_resultat(int descripteur_socket_serveur ){
 			printf("Erreur lors de la lecture de la taille du champ titre du FIFO\n");
 			exit(1);
 		}
-		noctets = read(descripteur_socket_serveur,titreR,taille_titre*sizeof(char));
+		noctets = read(descripteur_socket_client,titreR,taille_titre*sizeof(char));
 		if(noctets != taille_titre*sizeof(char)) {
 			printf("Erreur lors de la lecture du champ titre du FIFO\n");
 			exit(1);
@@ -251,7 +251,7 @@ int client_recoi_resultat(int descripteur_socket_serveur ){
 		printf("%s\t",titreR);
 
 		//Lecture et affichage de l'annee de parution
-		noctets = read(descripteur_socket_serveur, &annee_parution, sizeof(int));
+		noctets = read(descripteur_socket_client, &annee_parution, sizeof(int));
 		if(noctets != sizeof(int)) {
 			printf("Erreur lors de la lecture de l'annee de parution du FIFO\n");
 			exit(1);
@@ -259,7 +259,7 @@ int client_recoi_resultat(int descripteur_socket_serveur ){
 		printf("%i\t",annee_parution);
 		}
 		//Lecture et affichage du champ genre
-		noctets=read(descripteur_socket_serveur, &taille_genre, sizeof(int));
+		noctets=read(descripteur_socket_client, &taille_genre, sizeof(int));
 		if(noctets == sizeof(int)) {
 			genreR = malloc(taille_genre*sizeof(char));
 		}
@@ -267,7 +267,7 @@ int client_recoi_resultat(int descripteur_socket_serveur ){
 			printf("Erreur lors de la lecture de la taille du champ genre du FIFO\n");
 			exit(1);
 		}
-		noctets=read(descripteur_socket_serveur, genreR,taille_genre*sizeof(char));
+		noctets=read(descripteur_socket_client, genreR,taille_genre*sizeof(char));
 		if(noctets != taille_genre*sizeof(char)) {
 			printf("Erreur lors de la lecture du champ genre du FIFO\n");
 			exit(1);
@@ -309,7 +309,7 @@ void client_envoi_titre(int descripteur_socket_client, int nb_titre){
 	//comm-HLR05 finie
 }
 
-void client_recoi_cote(int descripteur_socket_serveur){
+void client_recoi_cote(int descripteur_socket_client){
 
 	int taille_ID_eval;
 	char* ID_eval;
@@ -322,7 +322,7 @@ void client_recoi_cote(int descripteur_socket_serveur){
 
 	//Lab 3 - comm HLR09
 	/* On recoit et affiche les informations du titre a evaluer */
-	noctets=read(descripteur_socket_serveur,&taille_ID_eval,sizeof(int));
+	noctets=read(descripteur_socket_client,&taille_ID_eval,sizeof(int));
 	if(noctets == sizeof(int)) {
 		ID_eval = malloc(taille_ID_eval*sizeof(char));
 	}
@@ -330,14 +330,14 @@ void client_recoi_cote(int descripteur_socket_serveur){
 		printf("Erreur lors de la lecture de la taille du champ ID du FIFO\n");
 		exit(1);
 	}
-	noctets=read(descripteur_socket_serveur, ID_eval,taille_ID_eval*sizeof(char));
+	noctets=read(descripteur_socket_client, ID_eval,taille_ID_eval*sizeof(char));
 	if(noctets != taille_ID_eval*sizeof(char)) {
 		printf("Erreur lors de la lecture du champ ID du FIFO\n");
 		exit(1);
 	}
 	printf("\t- Titre: %s\n",ID_eval);
 
-	noctets=read(descripteur_socket_serveur,&taille_cote_eval,sizeof(int));
+	noctets=read(descripteur_socket_client,&taille_cote_eval,sizeof(int));
 	if(noctets == sizeof(int)) {
 		cote_eval = malloc(taille_cote_eval*sizeof(char));
 	}
@@ -345,14 +345,14 @@ void client_recoi_cote(int descripteur_socket_serveur){
 		printf("Erreur lors de la lecture de la taille du champ cote du FIFO\n");
 		exit(1);
 	}
-	noctets=read(descripteur_socket_serveur, cote_eval,taille_cote_eval*sizeof(char));
+	noctets=read(descripteur_socket_client, cote_eval,taille_cote_eval*sizeof(char));
 	if(noctets != taille_cote_eval*sizeof(char)) {
 		printf("Erreur lors de la lecture du champ cote du FIFO\n");
 		exit(1);
 	}
 	printf("\t- Cote moyenne: %s /10 \n",cote_eval);
 
-	noctets = read(descripteur_socket_serveur, &nb_vote_eval, sizeof(int));
+	noctets = read(descripteur_socket_client, &nb_vote_eval, sizeof(int));
 	if(noctets != sizeof(int)) {
 		printf("Erreur lors de la lecture du nombre de vote du FIFO\n");
 		exit(1);
@@ -388,7 +388,7 @@ void client_envoi_cote(int descripteur_socket_client){
 	}
 }
 
-void client_recoit_nouvelle_cote(int descripteur_socket_serveur){
+void client_recoit_nouvelle_cote(int descripteur_socket_client){
 
 	int noctets = 0;
     int taille_ID;
@@ -400,7 +400,7 @@ void client_recoit_nouvelle_cote(int descripteur_socket_serveur){
 	//Lab 3 comm-HLR13
 	/* On recoit et affiche les nouvelles informations*/
 
-	noctets=read(descripteur_socket_serveur,&taille_ID,sizeof(int));
+	noctets=read(descripteur_socket_client,&taille_ID,sizeof(int));
 	if(noctets == sizeof(int)) {
 		ID = malloc(taille_ID*sizeof(char));
 	}
@@ -408,14 +408,14 @@ void client_recoit_nouvelle_cote(int descripteur_socket_serveur){
 		printf("Erreur lors de la lecture de la taille du champ ID du FIFO\n");
 		exit(1);
 	}
-	noctets=read(descripteur_socket_serveur,ID,taille_ID*sizeof(char));
+	noctets=read(descripteur_socket_client,ID,taille_ID*sizeof(char));
 	if(noctets != taille_ID*sizeof(char)) {
 		printf("Erreur lors de la lecture du champ ID du FIFO\n");
 		exit(1);
 	}
 	printf("\t- Titre: %s\n",ID);
 
-	noctets=read(descripteur_socket_serveur,&taille_cote,sizeof(int));
+	noctets=read(descripteur_socket_client,&taille_cote,sizeof(int));
 	if(noctets == sizeof(int)) {
 		nouvelle_cote = malloc(taille_cote*sizeof(char));
 	}
@@ -423,14 +423,14 @@ void client_recoit_nouvelle_cote(int descripteur_socket_serveur){
 		printf("Erreur lors de la lecture de la taille du champ cote du FIFO\n");
 		exit(1);
 	}
-	noctets=read(descripteur_socket_serveur, nouvelle_cote,taille_cote*sizeof(char));
+	noctets=read(descripteur_socket_client, nouvelle_cote,taille_cote*sizeof(char));
 	if(noctets != taille_cote*sizeof(char)) {
 		printf("Erreur lors de la lecture du champ cote du FIFO\n");
 		exit(1);
 	}
 	printf("\t- Nouvelle cote moyenne: %s /10 \n",nouvelle_cote);
 
-	noctets = read(descripteur_socket_serveur, &nb_vote, sizeof(int));
+	noctets = read(descripteur_socket_client, &nb_vote, sizeof(int));
 	if(noctets != sizeof(int)) {
 		printf("Erreur lors de la lecture du nombre de vote du FIFO\n");
 		exit(1);
