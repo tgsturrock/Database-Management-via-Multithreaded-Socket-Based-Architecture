@@ -135,6 +135,10 @@ int main(int argc, char *argv[]) {
 	adresse_serveur.sin_port = htons(10001);
 	taille_adresse_serveur = sizeof(adresse_serveur);
 
+	/**
+	 * Lab4 comm-HLR04
+	 * Si le client démarre en l'absence d'un serveur actif, le client émet un message d'erreur à l'utilisateur et termine
+	 */
 	/* connecter le socket du client au socket du serveur */
 	printf("[*] Tentative de connexion au serveur...\n");
 	success = connect(descripteur_socket_client, (struct sockaddr*)&adresse_serveur, taille_adresse_serveur);
@@ -145,7 +149,7 @@ int main(int argc, char *argv[]) {
 	} else {
 		printf("[*] Client connecté au serveur avec succès\n");
 	}
-
+	//comm-HLR04 finie
 
 	//Le client envoi les criteres de recherche
 	client_envoi_critere(descripteur_socket_client, critere);
