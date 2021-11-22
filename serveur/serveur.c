@@ -128,6 +128,7 @@ int main(int argc, char *argv[]) {
 	    		t_titre titre_chercher;
 	    		printf("[*] Titre a evaluer:\n");
 	    		titre_chercher = print_titre(resultat,(num_titre-1));
+
 	    		//Le serveur envoise la cote du titre demande
 	    		serveur_envoi_cote(descripteur_socket_client, titre_chercher);
 	    		//comm-HLR08 finie
@@ -141,6 +142,8 @@ int main(int argc, char *argv[]) {
 	    			printf("Probleme lors de la lecture de la cote envoyer par l'usager dans le FIFO\n");
 	    			exit(1);
 	    		}
+
+	    		//Mise a jour de la base de donnees
 	    		fichier_cote(titre_chercher, cote);
 	    		//comm-HLR11 finie
 
