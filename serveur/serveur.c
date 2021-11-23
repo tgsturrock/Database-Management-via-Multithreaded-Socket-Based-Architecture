@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 	int status;
 	pid_t* pid = NULL;
 
-
+///commentaire
 	int num_titre;
 	float cote;
 
