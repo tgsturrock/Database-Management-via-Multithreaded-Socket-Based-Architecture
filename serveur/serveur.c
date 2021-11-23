@@ -42,26 +42,26 @@ pthread_mutex_t lock;
 
 int main(int argc, char *argv[]) {
 	int noctets = 0;
-	int descripteur_socket_serveur, descripteur_socket_client;
+	int desc_socket_serveur, desc_socket_client;
 	unsigned int taille_adresse_serveur, taille_adresse_client;
 	struct sockaddr_in adresse_serveur, adresse_client;
 	int status;
 	pid_t* pid = NULL;
 
-///commentaire
+
 	int num_titre;
 	float cote;
 
-	close(descripteur_socket_serveur);
-	close(descripteur_socket_client);
+	close(desc_socket_serveur);
+	close(desc_socket_client);
 	/**
 	 * Lab4 comm-HLR01
 	 * Le client et le serveur doivent communiquer par l'entremise de sockets.
 	 */
 	/* creer un socket pour le serveur */
-	descripteur_socket_serveur = socket(AF_INET, SOCK_STREAM, 0);
+	desc_socket_serveur = socket(AF_INET, SOCK_STREAM, 0);
 
-	if (descripteur_socket_serveur == -1)
+	if (desc_socket_serveur == -1)
     {
         printf("Echec lors de la creation du socker serveur");
     }
@@ -72,19 +72,20 @@ int main(int argc, char *argv[]) {
 	adresse_serveur.sin_addr.s_addr = inet_addr("127.0.0.1"); /* l'adresse IP de l'hote du serveur */
 	adresse_serveur.sin_port = htons(10001);
 	taille_adresse_serveur = sizeof(adresse_serveur);
-	status = bind(descripteur_socket_serveur, (struct sockaddr *)&adresse_serveur, taille_adresse_serveur);
+	memset(adresse_serveur.sin_zero, '\0', sizeof adresse_serveur.sin_zero);
+	status = bind(desc_socket_serveur, (struct sockaddr *)&adresse_serveur, taille_adresse_serveur);
 	if(status == -1) {
 		printf("Échec lors de la configuration du socket serveur\n");
 	}
 
-	listen(descripteur_socket_serveur, 10);
+	listen(desc_socket_serveur, 10);
 
 	while(1) {
 
 	    printf("En attente de clients...\n");
 
 	    /* Accepter une connexion en provenance d'un client */
-	    descripteur_socket_client = accept(descripteur_socket_serveur, (struct sockaddr *)&adresse_client, &taille_adresse_client);
+	    desc_socket_client = accept(desc_socket_serveur, (struct sockaddr *)&adresse_client, &taille_adresse_client);
 
 	    printf("Connexion etablie avec un client a l'adresse IP %s\n", inet_ntoa(adresse_client.sin_addr));
 
@@ -92,7 +93,7 @@ int main(int argc, char *argv[]) {
 	    	t_critere critere = creer_critere();
 
 	    	//Le serveur recoit les critere de recherche envoye par le client
-	    	serveur_recoit_critere(descripteur_socket_client, critere);
+	    	serveur_recoit_critere(desc_socket_client, critere);
 	    	/* Tube-HLR03 finie */
 
 	    	//Recherche dans la base de donnee pour des titre qui concorde avec les criteres de recherche
@@ -109,14 +110,14 @@ int main(int argc, char *argv[]) {
 	    	//HLR25 finie
 
 
-	    	serveur_envoit_resultat(descripteur_socket_client, resultat);
+	    	serveur_envoit_resultat(desc_socket_client, resultat);
 
 	    	//Lab3 comm-HLR07
 	    	/*Si le champ relié à l'argument -v a bien été reçu lors du requis Comm-HLR02,
 	    	 *le serveur est capable de récupérer le titre à évaluer par le client.*/
 	    	if(get_evaluation(critere) == 1){
 
-	    		noctets = read(descripteur_socket_client, &num_titre, sizeof(int));
+	    		noctets = read(desc_socket_client, &num_titre, sizeof(int));
 	    		if(noctets != sizeof(int)) {
 	    			printf("Erreur lors de la lecture du numero de titre a evaluer \n");
 	    			exit(1);
@@ -130,14 +131,14 @@ int main(int argc, char *argv[]) {
 	    		titre_chercher = print_titre(resultat,(num_titre-1));
 
 	    		//Le serveur envoise la cote du titre demande
-	    		serveur_envoi_cote(descripteur_socket_client, titre_chercher);
+	    		serveur_envoi_cote(desc_socket_client, titre_chercher);
 	    		//comm-HLR08 finie
 
 
 	    		//Lab3 comm-HLR11
 	    		/*Le serveur est capable de recevoir la note sur 10 du client
 	    		 *et de calculer la nouvelle cote de classement du titre évalué.*/
-	    		noctets = read(descripteur_socket_client, &cote , sizeof(float));
+	    		noctets = read(desc_socket_client, &cote , sizeof(float));
 	    		if(noctets < sizeof(float)) {
 	    			printf("Probleme lors de la lecture de la cote envoyer par l'usager dans le FIFO\n");
 	    			exit(1);
@@ -147,7 +148,7 @@ int main(int argc, char *argv[]) {
 	    		fichier_cote(titre_chercher, cote);
 	    		//comm-HLR11 finie
 
-	    		serveur_envoi_nouvcote(descripteur_socket_client, titre_chercher);
+	    		serveur_envoi_nouvcote(desc_socket_client, titre_chercher);
 
 	    	}
 	    	//Tube-HLR04 finie
@@ -158,8 +159,8 @@ int main(int argc, char *argv[]) {
 	    	detruire_critere(critere);
 
 
-	    	close(descripteur_socket_serveur);
-	    	close(descripteur_socket_client);
+	    	close(desc_socket_serveur);
+	    	close(desc_socket_client);
 	    	//comm-HLR01 finie
 
 	}
@@ -170,4 +171,5 @@ int main(int argc, char *argv[]) {
 //HLR26 finie
 
 //HLR26 finie
+
 
