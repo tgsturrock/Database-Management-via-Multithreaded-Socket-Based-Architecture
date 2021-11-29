@@ -159,7 +159,7 @@ void client_envoi_critere(int descripteur_socket_client, t_critere critere){
 	if (strcmp(get_categorie(critere),null)!=0){
 		printf("\t[+] Categorie: %s\n", get_categorie(critere));
 	}
-	if (get_annee_parution_min(critere) != -1){
+	if (get_annee_parution_min(critere) != 0){
 		printf("\t[+] Annee_min: %i\n", get_annee_parution_min(critere));
 		printf("\t[+] Annee_max: %i\n", get_annee_parution_max(critere));
 	}

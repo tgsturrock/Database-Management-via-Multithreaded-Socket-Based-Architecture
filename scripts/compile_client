@@ -1,4 +1,0 @@
-#!/bin/sh
-clear
-cd ../client/
-gcc ./src/recherche.c  client.c -o client -I "/home/thomas/tmp/ELE216/laboratoires/troisieme-laboratoire/client/hdr"

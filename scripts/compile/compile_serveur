@@ -1,0 +1,4 @@
+#!/bin/sh
+clear
+cd ../serveur/
+gcc ./src/resultat.c ./src/imdb.c ./src/recherche.c  serveur.c -o serveur -I "/home/thomas/tmp/ELE216/laboratoires/troisieme-laboratoire/serveur/hdr/"

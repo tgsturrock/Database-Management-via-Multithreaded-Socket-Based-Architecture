@@ -18,7 +18,6 @@
 
 void client_envoi_critere(int descripteur_fifo_client_ecriture, t_critere critere);
 int client_recoi_resultat(int descripteur_fifo_serveur_lecture );
-
 void client_envoi_titre(int descripteur_fifo_client_ecriture, int nb_titre);
 void client_recoi_cote(int descripteur_fifo_serveur_lecture);
 void client_envoi_cote(int descripteur_fifo_client_ecriture);

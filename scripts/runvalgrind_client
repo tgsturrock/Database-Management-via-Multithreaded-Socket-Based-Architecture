@@ -1,4 +1,0 @@
-#!/bin/sh
-./compile_client
-cd ../applications/
-valgrind --leak-check=full --show-leak-kinds=all \./client -t "The Matrix"-a "1999" -v

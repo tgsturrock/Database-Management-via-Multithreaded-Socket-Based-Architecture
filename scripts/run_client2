@@ -1,0 +1,3 @@
+#!/bin/sh
+cd ../../client/Debug/
+./client "The Good" -g "Western" -a "1960:1970" -c "movie"

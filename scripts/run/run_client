@@ -1,0 +1,4 @@
+#!/bin/sh
+./compile_client
+cd ../applications/
+./client -t "The Matrix" -a "1999" -v

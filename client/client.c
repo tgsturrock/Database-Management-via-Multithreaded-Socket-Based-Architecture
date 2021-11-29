@@ -40,7 +40,7 @@
 
 int main(int argc, char *argv[]) {
 	char *titre = NULL, *genre = NULL, *annees = NULL, *categorie = NULL;
-	int descripteur_socket_client;
+	int desc_socket_client;
 	unsigned int taille_adresse_serveur;
 	struct sockaddr_in adresse_serveur;
 	int success;
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 	//On s<assure qu'au moins un titre est passe en parametre
 	while(titre == NULL){
 		printf ("[!] Veuillez saisir un titre\n");
-		scanf("%s", &titre);
+		scanf("%s", titre);
 	}
 	// Création de la structure critere et stockage des arguments reçus
 	t_critere critere = creer_critere();
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
 	 * Le client et le serveur doivent communiquer par l'entremise de sockets.
 	 */
 	/* creer un socket pour le client */
-	descripteur_socket_client = socket(AF_INET, SOCK_STREAM, 0);
+	desc_socket_client = socket(AF_INET, SOCK_STREAM, 0);
 	/* paramètres de connexion au serveur */
 	adresse_serveur.sin_family = AF_INET;
 	adresse_serveur.sin_addr.s_addr = inet_addr("127.0.0.1");
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
 	 */
 	/* connecter le socket du client au socket du serveur */
 	printf("[*] Tentative de connexion au serveur...\n");
-	success = connect(descripteur_socket_client, (struct sockaddr*)&adresse_serveur, taille_adresse_serveur);
+	success = connect(desc_socket_client, (struct sockaddr*)&adresse_serveur, taille_adresse_serveur);
 
 	if(success == -1) {
 		printf("[!] Échec lors de la connexion au serveur\n");
@@ -152,30 +152,30 @@ int main(int argc, char *argv[]) {
 	//comm-HLR04 finie
 
 	//Le client envoi les criteres de recherche
-	client_envoi_critere(descripteur_socket_client, critere);
+	client_envoi_critere(desc_socket_client, critere);
 
 	//Le client recoit les resultat envoye par le serveur et conserve la valeur du nombre de titre
-	nb_titre = client_recoi_resultat(descripteur_socket_client);
+	nb_titre = client_recoi_resultat(desc_socket_client);
 
 	//Lab3 comm-HLR05
 	/*Si l'argument -v a été donné par l'utilisateur, le client doit demander à l'utilisateur
 	 *quel titre désire-t-il évaluer dans la liste des résultats reçus du serveur.*/
 	if(get_evaluation(critere) == 1){
 
-		client_envoi_titre(descripteur_socket_client, nb_titre);
+		client_envoi_titre(desc_socket_client, nb_titre);
 
-		client_recoi_cote(descripteur_socket_client);
+		client_recoi_cote(desc_socket_client);
 
-		client_envoi_cote(descripteur_socket_client);
+		client_envoi_cote(desc_socket_client);
 
-		client_recoit_nouvelle_cote(descripteur_socket_client);
+		client_recoit_nouvelle_cote(desc_socket_client);
 
 	}
 	//comm-HLR06 finie
 
 	//On desaloue la memoire dedier au criteres de recherche
 	detruire_critere(critere);
-	close(descripteur_socket_client);
+	close(desc_socket_client);
 	//comm-HLR01 finie
 
 	printf("[-] Fermeture de l'application.\n");

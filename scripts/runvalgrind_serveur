@@ -1,4 +1,0 @@
-#!/bin/sh
-./compile_serveur
-cd ../applications/
-valgrind --leak-check=full --show-leak-kinds=all \./serveur

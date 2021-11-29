@@ -1,4 +1,0 @@
-#!/bin/sh
-cd ../second-laboratoire
-valgrind --leak-check=full --show-leak-kinds=all \./application -t "The Matrix" -a "1999"
-

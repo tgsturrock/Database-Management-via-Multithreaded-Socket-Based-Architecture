@@ -22,6 +22,7 @@
 #include "imdb.h"
 #include "resultat.h"
 #include "comm.h"
+#include "thread.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -37,23 +38,17 @@
 #include <pthread.h>
 #include <semaphore.h>
 
-pthread_mutex_t lock;
-
+#define MAX 60
+#define handle_error(msg) \
+           do { perror(msg); exit(EXIT_FAILURE); } while (0)
 
 int main(int argc, char *argv[]) {
-	int noctets = 0;
+
 	int desc_socket_serveur, desc_socket_client;
 	unsigned int taille_adresse_serveur, taille_adresse_client;
 	struct sockaddr_in adresse_serveur, adresse_client;
 	int status;
-	pid_t* pid = NULL;
 
-
-	int num_titre;
-	float cote;
-
-	close(desc_socket_serveur);
-	close(desc_socket_client);
 	/**
 	 * Lab4 comm-HLR01
 	 * Le client et le serveur doivent communiquer par l'entremise de sockets.
@@ -63,7 +58,7 @@ int main(int argc, char *argv[]) {
 
 	if (desc_socket_serveur == -1)
     {
-        printf("Echec lors de la creation du socker serveur");
+		handle_error("socket");
     }
     puts("Socket cree");
 
@@ -75,96 +70,43 @@ int main(int argc, char *argv[]) {
 	memset(adresse_serveur.sin_zero, '\0', sizeof adresse_serveur.sin_zero);
 	status = bind(desc_socket_serveur, (struct sockaddr *)&adresse_serveur, taille_adresse_serveur);
 	if(status == -1) {
+		handle_error("bind");
 		printf("Échec lors de la configuration du socket serveur\n");
 	}
 
 	listen(desc_socket_serveur, 10);
-
+	int i =0;
 	while(1) {
 
 	    printf("En attente de clients...\n");
 
+
+
 	    /* Accepter une connexion en provenance d'un client */
 	    desc_socket_client = accept(desc_socket_serveur, (struct sockaddr *)&adresse_client, &taille_adresse_client);
-
 	    printf("Connexion etablie avec un client a l'adresse IP %s\n", inet_ntoa(adresse_client.sin_addr));
 
-	    //Cree une structure critere pour enmagasiner les criteres de recherche
-	    	t_critere critere = creer_critere();
+	    int*p_socket_client=malloc(sizeof(int));
+		*p_socket_client=desc_socket_client;
 
-	    	//Le serveur recoit les critere de recherche envoye par le client
-	    	serveur_recoit_critere(desc_socket_client, critere);
-	    	/* Tube-HLR03 finie */
+		pthread_t tid[MAX];
+		 if( pthread_create(&tid[i++], NULL, handle_connection, p_socket_client) != 0 )
+		           printf("Failed to create thread\n");
 
-	    	//Recherche dans la base de donnee pour des titre qui concorde avec les criteres de recherche
-	    	printf("[*] Exploration de la base de donnees\n");
-	    	t_resultat resultat = lecture(critere);
+		        if( i >= 50)
+		        {
+		          i = 0;
+		          while(i < 50)
+		          {
+		            pthread_join(tid[i++],NULL);
+		          }
+		          i = 0;
+		        }
 
-	    	//Ajout des cotes de moyenne et nombre de vote aux resultats
-	    	lecture_cote(resultat);
-	    	//Lab2-HLR24 finie
-
-	    	//Affichage des resultats cote serveur
-	    	printf("[*] Visualisation des résultats\n");
-	    	fichier_resultat(resultat);
-	    	//HLR25 finie
-
-
-	    	serveur_envoit_resultat(desc_socket_client, resultat);
-
-	    	//Lab3 comm-HLR07
-	    	/*Si le champ relié à l'argument -v a bien été reçu lors du requis Comm-HLR02,
-	    	 *le serveur est capable de récupérer le titre à évaluer par le client.*/
-	    	if(get_evaluation(critere) == 1){
-
-	    		noctets = read(desc_socket_client, &num_titre, sizeof(int));
-	    		if(noctets != sizeof(int)) {
-	    			printf("Erreur lors de la lecture du numero de titre a evaluer \n");
-	    			exit(1);
-	    		}
-	    		//comm-HLR07 finie
-
-	    		//Lab3 comm-HLR08
-	    		/*Le serveur cherche les données de classement du titre à évaluer et les envoie au client.*/
-	    		t_titre titre_chercher;
-	    		printf("[*] Titre a evaluer:\n");
-	    		titre_chercher = print_titre(resultat,(num_titre-1));
-
-	    		//Le serveur envoise la cote du titre demande
-	    		serveur_envoi_cote(desc_socket_client, titre_chercher);
-	    		//comm-HLR08 finie
-
-
-	    		//Lab3 comm-HLR11
-	    		/*Le serveur est capable de recevoir la note sur 10 du client
-	    		 *et de calculer la nouvelle cote de classement du titre évalué.*/
-	    		noctets = read(desc_socket_client, &cote , sizeof(float));
-	    		if(noctets < sizeof(float)) {
-	    			printf("Probleme lors de la lecture de la cote envoyer par l'usager dans le FIFO\n");
-	    			exit(1);
-	    		}
-
-	    		//Mise a jour de la base de donnees
-	    		fichier_cote(titre_chercher, cote);
-	    		//comm-HLR11 finie
-
-	    		serveur_envoi_nouvcote(desc_socket_client, titre_chercher);
-
-	    	}
-	    	//Tube-HLR04 finie
-	    	//comm-HLR03 finie
-
-	    	//libere la memoire
-	    	detruire_resultat(resultat);
-	    	detruire_critere(critere);
-
-
-	    	close(desc_socket_serveur);
-	    	close(desc_socket_client);
-	    	//comm-HLR01 finie
 
 	}
-
+	close(desc_socket_serveur);
+	//comm-HLR01 finie
 	printf("[-] Fermeture du serveur.\n");
 	return 0;
 }

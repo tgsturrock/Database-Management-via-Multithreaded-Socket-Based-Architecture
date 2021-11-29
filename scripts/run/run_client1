@@ -1,0 +1,4 @@
+#!/bin/sh
+clear
+cd ../../client/Debug/
+./client -t "The Matrix" -a "1999" -v

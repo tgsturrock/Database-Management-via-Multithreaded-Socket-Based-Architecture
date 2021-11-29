@@ -1,0 +1,4 @@
+#!/bin/sh
+clear
+cd ../../client/Debug/
+./client -t "Harry Potter" -c "movie" -v
