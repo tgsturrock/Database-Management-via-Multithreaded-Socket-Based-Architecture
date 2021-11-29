@@ -103,10 +103,14 @@ void* handle_connection(void* p_socket_client){
 	}
 
 
-
+	/** Lab4 Serveur-HLR08
+	* Toute memoire alloue par un thread associe a un client est desallouee par ce thread.
+	*/
 	//libere la memoire
 	detruire_resultat(resultat);
 	detruire_critere(critere);
+	//Lab4 Serveur-HLR08 finie
+
 	close(desc_socket_client);
 	pthread_exit(NULL);
 
