@@ -28,8 +28,12 @@ void* handle_connection(void* p_socket_client){
 	int num_titre;
 	float cote;
 	int noctets;
+
+	//On met en banque la valeur du socket client passe en parametre
 	int desc_socket_client = *(int*)p_socket_client;
 	free(p_socket_client);
+	//Lab4 Serveur-HLR07 finie
+
 	//Cree une structure critere pour enmagasiner les criteres de recherche
 	t_critere critere = creer_critere();
 

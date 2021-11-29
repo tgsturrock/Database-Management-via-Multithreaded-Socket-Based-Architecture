@@ -89,6 +89,10 @@ int main(int argc, char *argv[]) {
 	    desc_socket_client = accept(desc_socket_serveur, (struct sockaddr *)&adresse_client, &taille_adresse_client);
 	    printf("Connexion etablie avec un client a l'adresse IP %s\n", inet_ntoa(adresse_client.sin_addr));
 
+	    /**Lab4 Serveur-HLR07
+	     * Toute mémoire allouée par le thread principal serveur doit être désallouée,
+	     * soit par le thread principal soit par un thread associé à un client
+	     */
 	    int*p_socket_client=malloc(sizeof(int));
 		*p_socket_client=desc_socket_client;
 
