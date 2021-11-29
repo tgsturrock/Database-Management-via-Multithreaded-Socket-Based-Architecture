@@ -23,6 +23,7 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
  * Le module responsable des accès en lecture et en écriture à la base de données
  * est responsable d'en maintenir l'intégrité en mode multitâche
  */
+int j =0;
 void* handle_connection(void* p_socket_client){
 
 	int num_titre;
@@ -50,15 +51,24 @@ void* handle_connection(void* p_socket_client){
 	 * Donc aucun autre thread ne peut modifier la base de donner
 	 * On utilise mutex_unlock lorsque l"operation de lecture est terminer.
 	 */
-
 	pthread_mutex_lock(&mutex);
+	j+=1;
+	pthread_mutex_unlock(&mutex);
+
+	/**Lab4 Serveur-HLR05
+	 * La base de données doit être accessible en lecture par plus d'un thread à la fois
+	 */
 	//Ajout des cotes de moyenne et nombre de vote aux resultats
 	lecture_cote(resultat);
+	//Serveur-HLR05 finie
 
 	//Affichage des resultats cote serveur
 	printf("[*] Visualisation des résultats\n");
 	fichier_resultat(resultat);
+	pthread_mutex_lock(&mutex);
+	j-=1;
 	pthread_mutex_unlock(&mutex);
+	//Serveur-HLR02 finie
 
 	serveur_envoit_resultat(desc_socket_client, resultat);
 
@@ -92,12 +102,19 @@ void* handle_connection(void* p_socket_client){
 		/**Lab4 Serveur-HLR02 et HlR04
 		 * On utilise mutex lock pour qu'il n'y ait qu'un seul thread puisse modifier la base de donnees a la fois.
 		 */
+		lecture_cote(resultat);
+
+		/**Lab 4 Serveur-HLR02
+		 * On verifie que aucun client fait une lecture avec la variable j
+		 */
+		if( j ==0 ){
 		pthread_mutex_lock(&mutex);
+
 		//Mise a jour de la base de donnees
 		fichier_cote(titre_chercher, cote);
-		pthread_mutex_unlock(&mutex);
 		//Lab4 Serveur-HLR02 et HlR04 finie
-
+		pthread_mutex_unlock(&mutex);
+		}
 		serveur_envoi_nouvcote(desc_socket_client, titre_chercher);
 
 	}
@@ -109,7 +126,7 @@ void* handle_connection(void* p_socket_client){
 	detruire_resultat(resultat);
 	detruire_critere(critere);
 	//Lab4 Serveur-HLR08 finie
-
+	pthread_mutex_destroy(&mutex);
 	close(desc_socket_client);
 	pthread_exit(NULL);
 
