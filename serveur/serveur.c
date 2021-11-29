@@ -80,7 +80,10 @@ int main(int argc, char *argv[]) {
 
 	    printf("En attente de clients...\n");
 
-
+	    /**Lab4 Serveur-HLR01
+	     * Apres avoir recu une requete de client, le serveur delegue l<interpretation et le
+	     * taitement de la requete a un nouveau thread
+	     */
 
 	    /* Accepter une connexion en provenance d'un client */
 	    desc_socket_client = accept(desc_socket_serveur, (struct sockaddr *)&adresse_client, &taille_adresse_client);
@@ -102,6 +105,7 @@ int main(int argc, char *argv[]) {
 		          }
 		          i = 0;
 		        }
+		 //Lab4 Serveur-HLR01 finie
 
 
 	}

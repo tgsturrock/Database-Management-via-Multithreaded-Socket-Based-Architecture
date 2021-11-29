@@ -33,20 +33,26 @@ void* handle_connection(void* p_socket_client){
 	//Le serveur recoit les critere de recherche envoye par le client
 	serveur_recoit_critere(desc_socket_client, critere);
 
-	//pthread_mutex_lock(&mutex);
-	//Recherche dans la base de donnee pour des titre qui concorde avec les criteres de recherche
 
+	//Recherche dans la base de donnee pour des titre qui concorde avec les criteres de recherche
 	printf("[*] Exploration de la base de donnees\n");
 	t_resultat resultat = lecture(critere);
 
+	/**Lab4 Serveur-HLR02
+	 * On se sert de mutex lock lorsqu'une operation de lecture se poursuit
+	 * Donc aucun autre thread ne peut modifier la base de donner
+	 * On utilise mutex_unlock lorsque l<operation de lecture est terminer.
+	 */
+
+	pthread_mutex_lock(&mutex);
 	//Ajout des cotes de moyenne et nombre de vote aux resultats
 	lecture_cote(resultat);
 
 	//Affichage des resultats cote serveur
 	printf("[*] Visualisation des résultats\n");
 	fichier_resultat(resultat);
+	pthread_mutex_unlock(&mutex);
 
-	//pthread_mutex_unlock(&mutex);
 	serveur_envoit_resultat(desc_socket_client, resultat);
 
 	/*Si le champ relié à l'argument -v a bien été reçu lors du requis Comm-HLR02,
