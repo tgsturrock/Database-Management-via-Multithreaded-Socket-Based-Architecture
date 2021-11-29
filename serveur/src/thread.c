@@ -85,14 +85,14 @@ void* handle_connection(void* p_socket_client){
 			printf("Probleme lors de la lecture de la cote envoyer par l'usager dans le FIFO\n");
 			exit(1);
 		}
-		/**Lab4 Serveur-HLR02
+		/**Lab4 Serveur-HLR02 et HlR04
 		 * On utilise mutex lock pour qu'il n'y ait qu'un seul thread puisse modifier la base de donnees a la fois.
 		 */
 		pthread_mutex_lock(&mutex);
 		//Mise a jour de la base de donnees
 		fichier_cote(titre_chercher, cote);
 		pthread_mutex_unlock(&mutex);
-		//Lab4 Serveur-HLR02 finie
+		//Lab4 Serveur-HLR02 et HlR04 finie
 
 		serveur_envoi_nouvcote(desc_socket_client, titre_chercher);
 
