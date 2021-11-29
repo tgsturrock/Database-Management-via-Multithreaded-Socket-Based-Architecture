@@ -83,7 +83,9 @@ int main(int argc, char *argv[]) {
 
 	int i =0;
 	while(1) {
-
+		/**Lab4 Comm-HLR3
+		 * une fois demarre, le serveur reste actif en attendant des connexions de clients
+		 */
 	    printf("En attente de clients...\n");
 
 	    /**Lab4 Serveur-HLR01
@@ -116,7 +118,7 @@ int main(int argc, char *argv[]) {
 		          i = 0;
 		        }
 		 //Lab4 Serveur-HLR01 finie
-
+		 //Lab4 Comm-HLR3 finie
 
 	}
 	close(desc_socket_serveur);
