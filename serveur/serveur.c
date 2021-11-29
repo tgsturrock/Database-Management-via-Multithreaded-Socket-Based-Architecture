@@ -77,6 +77,7 @@ int main(int argc, char *argv[]) {
 		handle_error("bind");
 		printf("Échec lors de la configuration du socket serveur\n");
 	}
+
 	listen(desc_socket_serveur, 10);
 	//Lab4 Comm-HLR02 finie
 
