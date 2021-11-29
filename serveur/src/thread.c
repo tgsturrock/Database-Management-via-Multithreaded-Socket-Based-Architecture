@@ -88,10 +88,11 @@ void* handle_connection(void* p_socket_client){
 		pthread_mutex_lock(&mutex);
 		//Mise a jour de la base de donnees
 		fichier_cote(titre_chercher, cote);
-
-		serveur_envoi_nouvcote(desc_socket_client, titre_chercher);
 		pthread_mutex_unlock(&mutex);
 		//Lab4 Serveur-HLR02 finie
+
+		serveur_envoi_nouvcote(desc_socket_client, titre_chercher);
+
 	}
 
 
