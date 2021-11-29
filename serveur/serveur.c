@@ -62,7 +62,11 @@ int main(int argc, char *argv[]) {
     }
     puts("Socket cree");
 
-	  /* relier le socket a l'adresse IP de l'hote et au port choisi */
+
+    /**Lab4 Comm-HLR02
+     * Un serveur unique recoit des requetes de plusieurs clients
+     */
+	/* relier le socket a l'adresse IP de l'hote et au port choisi */
 	adresse_serveur.sin_family = AF_INET; /* On va etablir une communication TCP/IP */
 	adresse_serveur.sin_addr.s_addr = inet_addr("127.0.0.1"); /* l'adresse IP de l'hote du serveur */
 	adresse_serveur.sin_port = htons(10001);
@@ -73,8 +77,9 @@ int main(int argc, char *argv[]) {
 		handle_error("bind");
 		printf("Échec lors de la configuration du socket serveur\n");
 	}
-
 	listen(desc_socket_serveur, 10);
+	//Lab4 Comm-HLR02 finie
+
 	int i =0;
 	while(1) {
 
