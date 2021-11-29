@@ -19,7 +19,10 @@
 #include <semaphore.h>
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-
+/**Lab4 Serveur-HLR06
+ * Le module responsable des accès en lecture et en écriture à la base de données
+ * est responsable d'en maintenir l'intégrité en mode multitâche
+ */
 void* handle_connection(void* p_socket_client){
 
 	int num_titre;
@@ -41,7 +44,7 @@ void* handle_connection(void* p_socket_client){
 	/**Lab4 Serveur-HLR02
 	 * On se sert de mutex lock lorsqu'une operation de lecture se poursuit
 	 * Donc aucun autre thread ne peut modifier la base de donner
-	 * On utilise mutex_unlock lorsque l<operation de lecture est terminer.
+	 * On utilise mutex_unlock lorsque l"operation de lecture est terminer.
 	 */
 
 	pthread_mutex_lock(&mutex);
@@ -83,7 +86,7 @@ void* handle_connection(void* p_socket_client){
 			exit(1);
 		}
 		/**Lab4 Serveur-HLR02
-		 * On utilise mutex lock pour qu'un seul thread puisse modifier la base de donnees a la fois.
+		 * On utilise mutex lock pour qu'il n'y ait qu'un seul thread puisse modifier la base de donnees a la fois.
 		 */
 		pthread_mutex_lock(&mutex);
 		//Mise a jour de la base de donnees
@@ -105,4 +108,4 @@ void* handle_connection(void* p_socket_client){
 
 	return NULL;
 }
-
+//Lab4 Serveur-HLR06
