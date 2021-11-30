@@ -62,13 +62,16 @@ int main(int argc, char *argv[]) {
     }
     puts("Socket cree");
 
+    int true = 1;
+    setsockopt(desc_socket_serveur,SOL_SOCKET,SO_REUSEADDR,&true,sizeof(int));
 
     /**Lab4 Comm-HLR02
      * Un serveur unique recoit des requetes de plusieurs clients
      */
 	/* relier le socket a l'adresse IP de l'hote et au port choisi */
 	adresse_serveur.sin_family = AF_INET; /* On va etablir une communication TCP/IP */
-	adresse_serveur.sin_addr.s_addr = inet_addr("127.0.0.1"); /* l'adresse IP de l'hote du serveur */
+	//adresse_serveur.sin_addr.s_addr = inet_addr("172.16.7.255"); /* l'adresse IP de l'hote du serveur */
+	adresse_serveur.sin_addr.s_addr = inet_addr("127.0.0.1");
 	adresse_serveur.sin_port = htons(10001);
 	taille_adresse_serveur = sizeof(adresse_serveur);
 	memset(adresse_serveur.sin_zero, '\0', sizeof adresse_serveur.sin_zero);

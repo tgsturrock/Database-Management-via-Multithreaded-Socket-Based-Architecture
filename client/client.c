@@ -56,6 +56,8 @@ int main(int argc, char *argv[]) {
 	 * afin d'associer des valeurs au chanps qui sont associees a ces arguments.
 	 */
 
+
+	/* On recoi les arguments passes dans le terminal*/
 	int opt;//variable servant a passer d'un argument a l'autre.
 	while((opt = getopt(argc, argv, ":tcagv")) != -1)
 	{
@@ -95,8 +97,10 @@ int main(int argc, char *argv[]) {
 	}
 	//On s<assure qu'au moins un titre est passe en parametre
 	while(titre == NULL){
+		titre = (char*) malloc(1024 * sizeof(char));
 		printf ("[!] Veuillez saisir un titre\n");
-		scanf("%s", titre);
+		fgets(titre, 1024, stdin);
+		titre[strcspn(titre, "\n")] = 0;
 	}
 	// Création de la structure critere et stockage des arguments reçus
 	t_critere critere = creer_critere();
@@ -123,33 +127,35 @@ int main(int argc, char *argv[]) {
 	if(flag == 1)
 		set_evaluation(critere, flag);
 
-	/**
-	 * Lab4 comm-HLR01
-	 * Le client et le serveur doivent communiquer par l'entremise de sockets.
-	 */
-	/* creer un socket pour le client */
-	desc_socket_client = socket(AF_INET, SOCK_STREAM, 0);
-	/* paramètres de connexion au serveur */
-	adresse_serveur.sin_family = AF_INET;
-	adresse_serveur.sin_addr.s_addr = inet_addr("127.0.0.1");
-	adresse_serveur.sin_port = htons(10001);
-	taille_adresse_serveur = sizeof(adresse_serveur);
+		/**
+		 * Lab4 comm-HLR01
+		 * Le client et le serveur doivent communiquer par l'entremise de sockets.
+		 */
+		/* creer un socket pour le client */
+		desc_socket_client = socket(AF_INET, SOCK_STREAM, 0);
+		/* paramètres de connexion au serveur */
+		adresse_serveur.sin_family = AF_INET;
+		//adresse_serveur.sin_addr.s_addr = inet_addr("10.196.81.219");
+		adresse_serveur.sin_addr.s_addr = inet_addr("127.0.0.1");
+		adresse_serveur.sin_port = htons(10001);
+		taille_adresse_serveur = sizeof(adresse_serveur);
 
-	/**
-	 * Lab4 comm-HLR04
-	 * Si le client démarre en l'absence d'un serveur actif, le client émet un message d'erreur à l'utilisateur et termine
-	 */
-	/* connecter le socket du client au socket du serveur */
-	printf("[*] Tentative de connexion au serveur...\n");
-	success = connect(desc_socket_client, (struct sockaddr*)&adresse_serveur, taille_adresse_serveur);
+		/**
+		 * Lab4 comm-HLR04
+		 * Si le client démarre en l'absence d'un serveur actif, le client émet un message d'erreur à l'utilisateur et termine
+		 */
+		/* connecter le socket du client au socket du serveur */
+		printf("[*] Tentative de connexion au serveur...\n");
+		success = connect(desc_socket_client, (struct sockaddr*)&adresse_serveur, taille_adresse_serveur);
 
-	if(success == -1) {
-		printf("[!] Échec lors de la connexion au serveur\n");
-		exit(1);
-	} else {
-		printf("[*] Client connecté au serveur avec succès\n");
-	}
-	//comm-HLR04 finie
+		if(success == -1) {
+			printf("[!] Échec lors de la connexion au serveur\n");
+			exit(1);
+		} else {
+			printf("[*] Client connecté au serveur avec succès\n");
+		}
+		//comm-HLR04 finie
+
 
 	//Le client envoi les criteres de recherche
 	client_envoi_critere(desc_socket_client, critere);
